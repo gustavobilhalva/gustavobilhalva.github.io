@@ -292,7 +292,14 @@ html[data-view="board"] #view-board{display:block}
 .quote-role{font-size:12px;color:var(--text-muted);margin-top:1px}
 
 /* ══════════════════════════════════════════════════════ RETRO ═══ */
-.retro{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+/* El contenedor es la pizarra: superficie con grilla de puntos */
+.retro{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start;
+  padding:26px 24px 30px;border-radius:var(--radius);
+  border:1px solid var(--line-soft);background-color:var(--surface-1);
+  background-image:radial-gradient(circle,var(--line) 1px,transparent 1px);
+  background-size:24px 24px;background-position:12px 12px;
+}
 .retro-col{--rc:var(--c-aqua)}
 .retro-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--line-soft)}
 .retro-icon{
@@ -303,14 +310,42 @@ html[data-view="board"] #view-board{display:block}
 .retro-icon svg{width:14px;height:14px}
 .retro-title{font-size:13.4px;font-weight:600;letter-spacing:-.01em;color:var(--text-primary);line-height:1.3}
 .retro-sub{font-size:11px;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;margin-top:1px}
-.retro-notes{display:flex;flex-direction:column;gap:11px}
+.retro-notes{display:flex;flex-direction:column;gap:20px}
+
+/* ── Post-it colgado de una chinche ── */
 .note{
-  background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius-sm);
-  padding:15px 16px 15px 17px;position:relative;overflow:hidden;
-  transition:transform .25s var(--ease),border-color .25s var(--ease);
+  --rot:0deg;
+  position:relative;margin-top:9px;padding:19px 17px 16px;
+  border-radius:3px;                                   /* papel, no tarjeta */
+  background:color-mix(in srgb,var(--rc) 15%,var(--surface-2));
+  border:1px solid color-mix(in srgb,var(--rc) 32%,transparent);
+  box-shadow:0 8px 18px -8px rgba(0,0,0,.75);
+  transform:rotate(var(--rot));
+  transform-origin:50% 0;                              /* pivota en la chinche */
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease);
+  cursor:pointer;
 }
-.note::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--rc);opacity:.8}
-.note:hover{transform:translateY(-2px);border-color:var(--line)}
+/* La chinche */
+.note::before{
+  content:'';position:absolute;top:-7px;left:50%;margin-left:-6px;
+  width:12px;height:12px;border-radius:50%;z-index:2;
+  background:radial-gradient(circle at 34% 30%,#fff 0 14%,var(--rc) 46%,color-mix(in srgb,var(--rc) 55%,#000) 100%);
+  box-shadow:0 2px 5px rgba(0,0,0,.65);
+}
+.note:hover{
+  transform:rotate(var(--rot)) translateY(-3px);
+  box-shadow:0 15px 28px -10px rgba(0,0,0,.85);
+}
+@keyframes pin-swing{
+  0%  {transform:rotate(var(--rot))}
+  18% {transform:rotate(calc(var(--rot) + 7deg))}
+  38% {transform:rotate(calc(var(--rot) - 5deg))}
+  56% {transform:rotate(calc(var(--rot) + 3.2deg))}
+  74% {transform:rotate(calc(var(--rot) - 1.8deg))}
+  88% {transform:rotate(calc(var(--rot) + .8deg))}
+  100%{transform:rotate(var(--rot))}
+}
+.note.swing{animation:pin-swing .95s var(--ease)}
 .note-lead{font-size:14.2px;font-weight:600;letter-spacing:-.015em;color:var(--text-primary);margin-bottom:6px;line-height:1.4}
 .note-text{font-size:13.4px;color:var(--text-secondary);line-height:1.58}
 
@@ -419,12 +454,30 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   *{animation:none!important;transition-duration:.01ms!important}
   html{scroll-behavior:auto}
   .reveal{opacity:1;transform:none}
+  .note{--rot:0deg}
+  .note:hover{transform:none}
 }
 
 /* ══════════════════════════════════════════════════ RESPONSIVE ═══ */
 @media (max-width:960px){
-  .board,.retro,.daily{grid-template-columns:1fr}
-  .retro{gap:32px}
+  /* El tablero y la retro NO se apilan: conservan sus columnas y se
+     deslizan al costado, como Trello o Miro en el celular. El 82%
+     de ancho deja asomar la columna siguiente para que se note. */
+  .board,.retro{
+    display:flex;
+    overflow-x:auto;overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;
+    gap:14px;
+    scrollbar-width:thin;scrollbar-color:var(--line) transparent;
+  }
+  .board>*,.retro>*{flex:0 0 min(82%,300px);scroll-snap-align:start}
+  .board{padding-bottom:6px}
+  .retro{padding:20px 0 24px 18px;gap:16px}
+  .retro>*:last-child{margin-right:18px}   /* padding derecho que el overflow se come */
+  .board::-webkit-scrollbar,.retro::-webkit-scrollbar{height:6px}
+  .board::-webkit-scrollbar-thumb,.retro::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+  .daily{grid-template-columns:1fr}
   .kpis{grid-template-columns:repeat(2,1fr)}
   .edu-list,.dod{grid-template-columns:1fr}
   .nav-links{display:none}
@@ -766,7 +819,7 @@ const DATA = {
     facts: [
       { kEs:"Inicio",     kEn:"Started",   vEs:"Julio 2011",            vEn:"July 2011" },
       { kEs:"Duración",   kEn:"Duration",  vEs:"15 años · en curso",    vEn:"15 years · ongoing" },
-      { kEs:"Increments", kEn:"Increments",vEs:"4 etapas",             vEn:"4 stages" },
+      { kEs:"Incrementos",kEn:"Increments",vEs:"4 etapas",             vEn:"4 stages" },
       { kEs:"Rol actual", kEn:"Current role", vEs:"Agile PM & Scrum Consultant", vEn:"Agile PM & Scrum Consultant" }
     ]
   },
@@ -1021,6 +1074,11 @@ const DATA = {
       { es:"Entrevistas y selección", en:"Interviewing & hiring" },
       { es:"Autonomía de equipos", en:"Team autonomy" }
     ]},
+    { es:"Idiomas", en:"Languages", items:[
+      { es:"Español · Nativo",                      en:"Spanish · Native" },
+      { es:"Inglés · Competencia profesional",      en:"English · Professional working proficiency" },
+      { es:"Experiencia laboral en inglés",         en:"Professional experience working in English" }
+    ]},
     { es:"Base técnica", en:"Engineering background", items:[
       { es:"Smalltalk", en:"Smalltalk" },
       { es:"Java", en:"Java" },
@@ -1056,7 +1114,7 @@ const I18N = {
     "hero.location":"GBA · Buenos Aires · Argentina",
     "hero.role":"Agile Project Manager & Scrum Master · PSM II",
     "hero.tagline":"De construir software a liderar a quienes lo construyen.",
-    "hero.summary":"Lidero equipos ágiles y gestiono proyectos tecnológicos articulando las necesidades del negocio con la ejecución real de los equipos. Especialista en Scrum y Kanban, con foco en facilitación, gestión de dependencias, seguimiento de métricas y mejora continua. Ocho años como developer me dieron algo que no se aprende en un curso: entender los contextos complejos desde adentro y acompañar a los equipos con criterio técnico propio.",
+    "hero.summary":"Lidero equipos ágiles y gestiono proyectos tecnológicos traduciendo las necesidades del negocio en algo que los equipos puedan ejecutar. Especialista en Scrum y Kanban, con foco en facilitación, gestión de dependencias, seguimiento de métricas y mejora continua. Ocho años como developer me dieron algo que no se aprende en un curso: entender los contextos complejos desde adentro y acompañar a los equipos con criterio técnico propio.",
     "hero.cta1":"Hablemos",
     "hero.cta2":"Descargar CV",
     "hero.photoHint":"Foto pendiente",
@@ -1065,7 +1123,7 @@ const I18N = {
     "fb.intro":"En una Review el feedback no lo da quien construyó: lo dan quienes recibieron el trabajo. Estas son sus palabras.",
 
     "review.title":"Lo que entregué",
-    "review.intro":"Quince años, dos oficios: empecé escribiendo código y terminé cuidando el proceso que lo hace posible. Explorá la trayectoria como línea de tiempo o como tablero — los mismos datos, dos formas de leerlos. Hacé click en cualquier tarjeta para ver el detalle.",
+    "review.intro":"Quince años en tecnología: ocho escribiendo código y siete cuidando el proceso que lo hace posible. Explorá la trayectoria como línea de tiempo o como tablero — los mismos datos, dos formas de leerlos. Hacé click en cualquier tarjeta para ver el detalle.",
     "review.ceremony":"En una Review no se muestra lo que se planeó: se muestra lo que efectivamente se construyó.",
     "review.filterLabel":"Filtrar por:",
     "review.viewTimeline":"Línea de tiempo",
@@ -1074,31 +1132,31 @@ const I18N = {
     "review.noItems":"Sin resultados para este filtro",
 
     "retro.title":"Lo que aprendí",
-    "retro.intro":"Un CV lista logros. Una retrospectiva es más honesta: incluye lo que salió mal. Estas son las conclusiones de quince años de sprints, ordenadas como las ordenaría cualquier equipo.",
+    "retro.intro":"Un CV enumera logros. Una retrospectiva es más honesta: incluye lo que salió mal. Estas son las conclusiones de quince años de sprints, ordenadas como las ordenaría cualquier equipo.",
     "retro.ceremony":"La retro es el único evento donde el equipo se mira a sí mismo en lugar de mirar el producto.",
 
     "dod.title":"Cómo trabajo",
-    "dod.intro":"Un equipo acuerda cuándo algo está terminado para no discutirlo caso por caso. Esta es la mía: los criterios que uso para saber si mi trabajo con un equipo realmente terminó.",
+    "dod.intro":"Un equipo acuerda cuándo algo está terminado para no discutirlo caso por caso. Esta es mi Definition of Done: los criterios que uso para saber si mi trabajo con un equipo realmente terminó.",
     "dod.ceremony":"Sin una Definition of Done compartida, «listo» significa una cosa distinta para cada persona.",
 
     "skills.title":"Lo que traigo a un equipo",
-    "skills.intro":"Un set poco habitual: el vocabulario de la agilidad y la gestión, sostenido por una base técnica real.",
+    "skills.intro":"Una combinación poco habitual: el vocabulario de la agilidad y la gestión, sostenido por una base técnica real.",
     "skills.verifiedTitle":"Verificadas por un tercero",
     "skills.verifiedNote":"{k} de las {n} competencias respaldadas por insignias en mi perfil de",
 
     "edu.title":"Formación continua",
-    "edu.intro":"Lo que sigue en el backlog personal: nunca dejó de refinarse.",
+    "edu.intro":"Mi backlog personal de formación: nunca dejó de refinarse.",
     "edu.certsTitle":"Otras certificaciones",
     "edu.certsLink":"Ver todas verificadas en Credly",
 
     "daily.title":"En qué estoy hoy",
-    "daily.intro":"Las tres preguntas de cualquier daily, respondidas sobre mi propia carrera.",
+    "daily.intro":"Las tres preguntas de cualquier daily, aplicadas a mi propia carrera.",
 
     "contact.title":"¿Armamos el próximo sprint?",
     "contact.intro":"Estoy abierto a conversar sobre roles de Agile Project Manager, Scrum Master o consultoría ágil. Escribime y coordinamos una charla.",
     "contact.linkedin":"Ver perfil de LinkedIn",
     "contact.place":"GBA, Buenos Aires, Argentina",
-    "footer.note":"Hecho a mano · Actualizado en 2026"
+    "footer.note":"Escrito y diseñado por mí · Actualizado en 2026"
   },
   en:{
     "nav.review":"Sprint Review","nav.retro":"Retrospective","nav.dod":"Definition of Done",
@@ -1106,7 +1164,7 @@ const I18N = {
     "hero.location":"Greater Buenos Aires · Argentina",
     "hero.role":"Agile Project Manager & Scrum Master · PSM II",
     "hero.tagline":"From building software to leading the people who build it.",
-    "hero.summary":"I lead agile teams and manage technology projects, connecting business needs with how teams actually deliver. Specialist in Scrum and Kanban, focused on facilitation, dependency management, metrics tracking and continuous improvement. Eight years as a developer gave me something no course teaches: understanding complex contexts from the inside and guiding teams with real technical judgement.",
+    "hero.summary":"I lead agile teams and manage technology projects, turning business needs into something teams can actually deliver. Specialist in Scrum and Kanban, focused on facilitation, dependency management, metrics tracking and continuous improvement. Eight years as a developer gave me something no course teaches: understanding complex contexts from the inside and guiding teams with real technical judgement.",
     "hero.cta1":"Get in touch",
     "hero.cta2":"Download CV",
     "hero.photoHint":"Photo pending",
@@ -1115,7 +1173,7 @@ const I18N = {
     "fb.intro":"In a Review, feedback doesn't come from whoever built it — it comes from the people who received the work. These are their words.",
 
     "review.title":"What I delivered",
-    "review.intro":"Fifteen years, two crafts: I started writing code and ended up caring for the process that makes it possible. Explore my career as a timeline or as a board — same data, two ways to read it. Click any card for the detail.",
+    "review.intro":"Fifteen years in technology: eight writing code and seven shaping the process that makes it possible. Explore my career as a timeline or as a board — same data, two ways to read it. Click any card for the detail.",
     "review.ceremony":"A Review doesn't show what was planned. It shows what was actually built.",
     "review.filterLabel":"Filter by:",
     "review.viewTimeline":"Timeline",
@@ -1128,7 +1186,7 @@ const I18N = {
     "retro.ceremony":"The retro is the only event where the team looks at itself instead of at the product.",
 
     "dod.title":"How I work",
-    "dod.intro":"A team agrees on when something is done so it doesn't have to argue case by case. Here's mine: the criteria I use to know whether my work with a team is actually finished.",
+    "dod.intro":"A team agrees on when something is done so it doesn't have to argue case by case. This is my own Definition of Done: the criteria I use to know whether my work with a team is actually finished.",
     "dod.ceremony":"Without a shared Definition of Done, “done” means something different to every person.",
 
     "skills.title":"What I bring to a team",
@@ -1137,18 +1195,18 @@ const I18N = {
     "skills.verifiedNote":"{k} of the {n} badge-backed skills on my profile at",
 
     "edu.title":"Continuous learning",
-    "edu.intro":"What's next in the personal backlog — it never stopped being refined.",
+    "edu.intro":"My personal learning backlog — it never stopped being refined.",
     "edu.certsTitle":"Other certifications",
     "edu.certsLink":"See all verified on Credly",
 
     "daily.title":"Where I am today",
-    "daily.intro":"The three questions of any daily, answered about my own career.",
+    "daily.intro":"The three questions of any daily, applied to my own career.",
 
     "contact.title":"Shall we plan the next sprint?",
     "contact.intro":"I'm open to conversations about Agile Project Manager, Scrum Master or agile consulting roles. Drop me a line and let's talk.",
     "contact.linkedin":"View LinkedIn profile",
     "contact.place":"Greater Buenos Aires, Argentina",
-    "footer.note":"Handcrafted · Updated 2026"
+    "footer.note":"Written and designed by me · Updated 2026"
   }
 };
 
@@ -1304,8 +1362,10 @@ function renderRetro(){
         <div><div class="retro-title">${h.title}</div><div class="retro-sub">${col.notes.length} ${lang==='es'?'notas':'notes'}</div></div>
       </div>
       <div class="retro-notes">
-        ${col.notes.map(n => { const x = L(n);
-          return `<div class="note"><div class="note-lead">${x.lead}</div><div class="note-text">${x.text}</div></div>`;
+        ${col.notes.map((n, i) => { const x = L(n);
+          // Rotaciones fijas para que el tablero se vea puesto a mano, no al azar
+          const rot = [-1.6, 1.2, -0.7, 1.7, -1.1][(ci * 2 + i) % 5];
+          return `<div class="note" style="--rot:${rot}deg"><div class="note-lead">${x.lead}</div><div class="note-text">${x.text}</div></div>`;
         }).join('')}
       </div>
     </div>`;
@@ -1432,6 +1492,17 @@ document.addEventListener('click', e => {
     c.classList.toggle('open', willOpen);
     c.querySelector('.card-btn').setAttribute('aria-expanded', String(willOpen));
   });
+});
+
+/* Click en un post-it: se balancea colgando de la chinche */
+document.addEventListener('click', e => {
+  const note = e.target.closest('.note'); if (!note) return;
+  note.classList.remove('swing');
+  void note.offsetWidth;                       // reinicia la animación si ya estaba corriendo
+  note.classList.add('swing');
+});
+document.addEventListener('animationend', e => {
+  if (e.animationName === 'pin-swing') e.target.classList.remove('swing');
 });
 
 let io;

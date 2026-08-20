@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  PORTFOLIO — Gustavo Andrés Bilhalva
+  Estructurado como un sprint: Review, Retrospective, Definition of Done,
+  Sprint Backlog, Refinement y Daily.
+
+  Archivo único y autocontenido. No necesita servidor ni dependencias.
+
+  ══ CÓMO EDITARLO ══════════════════════════════════════════════════════════
+  Todo el contenido vive en el objeto DATA (buscá "const DATA" más abajo).
+  Cada texto tiene su versión "es" y "en".
+
+  1. FOTO — buscá "FOTO AQUÍ" en el HTML.
+
+  2. ⚠ RETROSPECTIVA — buscá "DATA.retro". TODO ESE CONTENIDO ES UN BORRADOR
+     escrito a partir de tu CV. Leelo y cambiá lo que no te represente: es la
+     sección más personal del sitio y tiene que sonar a vos, no a mí.
+     Lo mismo aplica a DATA.dod (Definition of Done) y DATA.sprint.goal.
+
+  3. MÉTRICAS — cada experiencia acepta un array "metrics" (hoy vacío):
+        metrics: [
+          { value: "12",  es: "personas en el equipo", en: "people on the team" },
+          { value: "98%", es: "cumplimiento de SLA",   en: "SLA compliance" }
+        ]
+     Si queda vacío no se muestra nada. Nada se rompe.
+  ============================================================================
+-->
+<html lang="es" data-view="timeline">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gustavo Bilhalva · Agile Project Manager & Scrum Master</title>
+<meta name="description" content="Agile Project Manager y Scrum Master con 15 años en tecnología: 8 construyendo software y más de 6 liderando los equipos que lo construyen.">
+<meta name="color-scheme" content="dark">
+
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Gustavo Bilhalva · Agile Project Manager & Scrum Master">
+<meta property="og:description" content="De construir software a liderar a quienes lo construyen. Un portfolio estructurado como un sprint: Review, Retrospectiva y Definition of Done.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2312171f'/><text x='50' y='68' font-size='52' font-family='system-ui,sans-serif' font-weight='600' fill='%234fd6a5' text-anchor='middle'>GB</text></svg>">
+
+<style>
+/* ═══════════════════════════════════════════════════════ TOKENS ═══ */
+:root{
+  --surface-0:#0c1015;
+  --surface-1:#12171f;
+  --surface-2:#181f29;
+  --surface-3:#1f2836;
+  --line:#26303d;
+  --line-soft:#1c2531;
+
+  --text-primary:#f2f5f8;
+  --text-secondary:#a8b4c2;
+  --text-muted:#6f7d8d;
+
+  --accent:#4fd6a5;
+  --accent-dim:#199e70;
+  --accent-glow:rgba(79,214,165,.14);
+
+  /* Paleta categórica validada para superficie oscura (CVD + contraste) */
+  --c-blue:#3987e5;
+  --c-orange:#d95926;
+  --c-aqua:#199e70;
+
+  --phase-tecnica:var(--c-blue);
+  --phase-transicion:var(--c-orange);
+  --phase-agil:var(--c-aqua);
+
+  --radius:14px;
+  --radius-sm:9px;
+  --maxw:1120px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+}
+
+/* ══════════════════════════════════════════════════════════ BASE ═══ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%}
+body{
+  margin:0;font-family:var(--font);background:var(--surface-0);color:var(--text-primary);
+  line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(760px 420px at 12% -6%, rgba(79,214,165,.10), transparent 62%),
+    radial-gradient(680px 400px at 92% 4%, rgba(57,135,229,.09), transparent 62%);
+}
+h1,h2,h3,h4{margin:0;line-height:1.18;font-weight:600;letter-spacing:-.021em}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px;position:relative;z-index:1}
+
+/* ═══════════════════════════════════════════════ SCROLL PROGRESS ═══ */
+#progress{
+  position:fixed;top:0;left:0;height:2px;width:0%;z-index:120;
+  background:linear-gradient(90deg,var(--c-blue),var(--c-orange),var(--accent));
+  transition:width .1s linear;
+}
+
+/* ══════════════════════════════════════════════════════ NAVBAR ═══ */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(12,16,21,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid transparent;transition:border-color .3s var(--ease),background .3s var(--ease);
+}
+header.scrolled{border-bottom-color:var(--line-soft);background:rgba(12,16,21,.9)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;height:66px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:-.02em;flex-shrink:0}
+.brand-mark{
+  width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--accent-dim),var(--c-blue));
+  color:#08110d;font-size:12.5px;font-weight:700;
+}
+.brand-name{font-size:14.5px}
+.nav-links{display:flex;gap:2px;align-items:center}
+.nav-links a{font-size:13px;color:var(--text-secondary);padding:7px 9px;border-radius:8px;transition:color .2s,background .2s;white-space:nowrap}
+.nav-links a:hover{color:var(--text-primary);background:var(--surface-2)}
+.nav-links a.active{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.lang-switch{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:2.5px}
+.lang-switch button{font-size:12px;font-weight:600;padding:4.5px 11px;border-radius:6.5px;color:var(--text-muted);transition:.2s var(--ease);letter-spacing:.03em}
+.lang-switch button[aria-pressed="true"]{background:var(--surface-3);color:var(--text-primary)}
+
+/* ════════════════════════════════════════════════════════ HERO ═══ */
+.hero{padding:142px 0 46px}
+.hero-grid{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:start}
+.hero-badges{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:20px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;font-weight:500}
+.avail{
+  display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--accent);
+  padding:5px 13px 5px 11px;border-radius:20px;
+  border:1px solid rgba(79,214,165,.3);background:rgba(79,214,165,.08);
+}
+.avail .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);position:relative;flex-shrink:0}
+.avail .dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--accent);opacity:.45;animation:pulse 2.4s var(--ease) infinite}
+.hero h1{font-size:clamp(2.3rem,5.4vw,3.55rem);letter-spacing:-.035em;margin-bottom:14px}
+.hero h1 .light{color:var(--text-secondary);font-weight:300}
+.hero-role{font-size:clamp(1.02rem,2vw,1.16rem);font-weight:500;color:var(--accent);margin-bottom:22px}
+.hero-tagline{
+  font-size:clamp(1.16rem,2.6vw,1.42rem);font-weight:300;color:var(--text-primary);
+  line-height:1.42;letter-spacing:-.02em;max-width:19ch;
+  padding-left:18px;border-left:2px solid var(--line);margin-bottom:26px;
+}
+.hero-summary{color:var(--text-secondary);font-size:15.4px;max-width:60ch;margin-bottom:32px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:11px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 19px;border-radius:10px;font-size:14px;font-weight:500;transition:.22s var(--ease);border:1px solid transparent}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.btn-primary{background:var(--accent);color:#062018;font-weight:600}
+.btn-primary:hover{background:#6ee2b8;transform:translateY(-1.5px);box-shadow:0 8px 22px -8px var(--accent)}
+.btn-ghost{border-color:var(--line);color:var(--text-secondary);background:var(--surface-1)}
+.btn-ghost:hover{border-color:var(--text-muted);color:var(--text-primary);transform:translateY(-1.5px)}
+
+.photo{
+  width:186px;height:186px;border-radius:22px;flex-shrink:0;position:relative;
+  background:linear-gradient(150deg,var(--surface-2),var(--surface-1));
+  border:1.5px dashed var(--line);display:grid;place-items:center;overflow:hidden;
+}
+.photo img{width:100%;height:100%;object-fit:cover;border-radius:20px}
+.photo-mono{font-size:44px;font-weight:600;letter-spacing:-.03em;color:var(--surface-3)}
+.photo-hint{position:absolute;bottom:13px;left:0;right:0;text-align:center;font-size:10.5px;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase}
+
+/* ═══════════════════════════════════════════════════ KPI TILES ═══ */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden;margin-top:56px}
+.kpi{background:var(--surface-1);padding:22px 22px 20px;transition:background .25s var(--ease)}
+.kpi:hover{background:var(--surface-2)}
+.kpi-value{font-size:2.15rem;font-weight:600;letter-spacing:-.04em;line-height:1;margin-bottom:9px}
+.kpi-value .unit{font-size:1.02rem;font-weight:500;color:var(--text-muted);margin-left:3px}
+.kpi-value.is-text{font-size:1.72rem;letter-spacing:-.02em}
+.kpi-value.is-text .unit{font-size:1.72rem;font-weight:600;color:var(--accent);margin-left:6px}
+.kpi-label{font-size:12.6px;color:var(--text-secondary);line-height:1.4}
+.kpi-note{font-size:11.4px;color:var(--text-muted);margin-top:5px}
+
+/* ══════════════════════════════════════════════ SPRINT BANNER ═══ */
+.sprint{
+  margin-top:18px;background:var(--surface-1);border:1px solid var(--line-soft);
+  border-radius:var(--radius);overflow:hidden;position:relative;
+}
+.sprint::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--c-blue))}
+.sprint-top{
+  display:flex;align-items:center;gap:10px;padding:15px 24px;
+  border-bottom:1px solid var(--line-soft);background:var(--surface-2);
+}
+.live{width:7px;height:7px;border-radius:50%;background:var(--accent);position:relative;flex-shrink:0}
+.live::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--accent);opacity:.45;animation:pulse 2.4s var(--ease) infinite}
+@keyframes pulse{0%{transform:scale(.7);opacity:.6}70%{transform:scale(1.5);opacity:0}100%{opacity:0}}
+.sprint-status{font-size:11.4px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.sprint-id{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--text-muted);letter-spacing:.02em}
+.sprint-main{padding:24px}
+.sprint-goal-label{font-size:11px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px}
+.sprint-goal{font-size:clamp(1.08rem,2.3vw,1.3rem);font-weight:400;letter-spacing:-.022em;line-height:1.45;color:var(--text-primary);max-width:46ch}
+.sprint-facts{display:flex;flex-wrap:wrap;gap:0;margin-top:22px;margin-bottom:-16px;border-top:1px solid var(--line-soft);padding-top:18px}
+.fact{flex:1 1 150px;padding-right:20px;margin-bottom:16px}
+.fact-k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.fact-v{font-size:14.4px;font-weight:500;color:var(--text-primary)}
+
+/* ════════════════════════════════════════════════════ SECTIONS ═══ */
+section{padding:56px 0;position:relative;z-index:1}
+.sec-head{margin-bottom:28px}
+.sec-kicker{
+  display:inline-flex;align-items:center;gap:8px;font-size:11.4px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:13px;
+  padding:4px 11px 4px 9px;border:1px solid rgba(79,214,165,.28);border-radius:20px;
+  background:rgba(79,214,165,.07);
+}
+.sec-kicker::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.sec-head h2{font-size:clamp(1.55rem,3.3vw,2.05rem);letter-spacing:-.03em;margin-bottom:11px}
+.sec-head p{color:var(--text-secondary);font-size:14.8px;max-width:64ch}
+.sec-head .ceremony{color:var(--text-muted);font-size:13.6px;font-style:italic;max-width:64ch;margin-top:9px;padding-left:13px;border-left:2px solid var(--line-soft)}
+
+/* ══════════════════════════════════════════════════ CONTROLES ═══ */
+.controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--line-soft)}
+.filters{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.filters-label{font-size:12px;color:var(--text-muted);margin-right:3px}
+.chip{font-size:12.6px;padding:6px 13px;border-radius:20px;border:1px solid var(--line);color:var(--text-secondary);transition:.2s var(--ease);background:var(--surface-1)}
+.chip:hover{border-color:var(--text-muted);color:var(--text-primary)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#062018;font-weight:600}
+.view-switch{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.view-switch button{display:flex;align-items:center;gap:7px;font-size:12.8px;font-weight:500;padding:6.5px 14px;border-radius:7px;color:var(--text-muted);transition:.22s var(--ease)}
+.view-switch button svg{width:14px;height:14px}
+.view-switch button[aria-pressed="true"]{background:var(--surface-3);color:var(--text-primary)}
+
+/* ══════════════════════════════════════════════════════ CARDS ═══ */
+.card{background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden;transition:border-color .25s var(--ease),opacity .3s var(--ease);position:relative}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--phase-color);opacity:.85}
+.card:hover{border-color:var(--line)}
+.card.dimmed{opacity:.24;pointer-events:none}
+.card-btn{width:100%;text-align:left;padding:20px 22px;display:block}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:5px}
+.card-org{font-size:11.4px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--phase-color);margin-bottom:7px;display:block}
+.card-role{font-size:15.6px;font-weight:600;letter-spacing:-.02em;line-height:1.35}
+.card-meta{font-size:12.4px;color:var(--text-muted);margin-top:7px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.card-meta .sep{opacity:.4}
+#view-board .card-meta{flex-direction:column;align-items:flex-start;gap:2px}
+#view-board .card-meta .sep{display:none}
+.card-toggle{flex-shrink:0;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--surface-2);color:var(--text-muted);transition:.25s var(--ease)}
+.card-toggle svg{width:13px;height:13px;transition:transform .3s var(--ease)}
+.card.open .card-toggle{background:var(--surface-3);color:var(--text-primary)}
+.card.open .card-toggle svg{transform:rotate(180deg)}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:13px}
+.tag{font-size:11px;padding:3.5px 9px;border-radius:6px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--line-soft)}
+.card-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s var(--ease)}
+.card.open .card-body{grid-template-rows:1fr}
+.card-body-inner{overflow:hidden}
+.card-body-pad{padding:0 22px 22px;border-top:1px solid var(--line-soft);margin-top:2px;padding-top:18px}
+.metrics{display:flex;flex-wrap:wrap;gap:1px;background:var(--line-soft);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:18px}
+.metric{background:var(--surface-2);padding:11px 15px;flex:1 1 130px}
+.metric-value{font-size:1.32rem;font-weight:600;letter-spacing:-.03em;line-height:1.1;color:var(--phase-color)}
+.metric-label{font-size:11.6px;color:var(--text-muted);margin-top:3px}
+.bullets li{position:relative;padding-left:19px;margin-bottom:11px;font-size:14.2px;color:var(--text-secondary);line-height:1.6}
+.bullets li:last-child{margin-bottom:0}
+.bullets li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:2px;background:var(--phase-color);opacity:.7}
+
+/* ═══════════════════════════════════════════════════ TIMELINE ═══ */
+.timeline{position:relative;padding-left:30px}
+.timeline::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1.5px;background:linear-gradient(180deg,var(--c-aqua),var(--c-orange),var(--c-blue));opacity:.42}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-item:last-child{margin-bottom:0}
+.tl-node{position:absolute;left:-30px;top:22px;width:11px;height:11px;border-radius:50%;background:var(--phase-color);border:2.5px solid var(--surface-0);box-shadow:0 0 0 2.5px var(--phase-color)}
+
+/* ══════════════════════════════════════════════════════ BOARD ═══ */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.col-head{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line-soft)}
+.col-swatch{width:9px;height:9px;border-radius:3px;background:var(--phase-color);flex-shrink:0}
+.col-title{font-size:12.4px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text-secondary)}
+.col-count{margin-left:auto;font-size:11px;color:var(--text-muted);background:var(--surface-2);padding:2px 8px;border-radius:20px;border:1px solid var(--line-soft)}
+.col-years{font-size:11px;color:var(--text-muted)}
+.col-cards{display:flex;flex-direction:column;gap:12px}
+.col-empty{border:1.5px dashed var(--line-soft);border-radius:var(--radius);padding:22px;text-align:center;font-size:12.4px;color:var(--text-muted)}
+#view-timeline,#view-board{display:none}
+html[data-view="timeline"] #view-timeline{display:block}
+html[data-view="board"] #view-board{display:block}
+
+/* ══════════════════════════════════════════════════ TESTIMONIOS ═══ */
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.quote{
+  margin:0;background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);
+  padding:24px;position:relative;transition:border-color .25s var(--ease),transform .25s var(--ease);
+  display:flex;flex-direction:column;
+}
+.quote blockquote{margin:0}
+.quote-who{margin-top:auto}
+.quote:hover{border-color:var(--line);transform:translateY(-2px)}
+.quote-mark{font-size:44px;line-height:.6;color:var(--accent);opacity:.32;font-weight:700;display:block;margin-bottom:8px}
+.quote-text{font-size:14.6px;color:var(--text-secondary);line-height:1.62;margin-bottom:18px}
+.quote-who{display:flex;align-items:center;gap:11px;padding-top:15px;border-top:1px solid var(--line-soft)}
+.quote-av{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  background:var(--surface-3);color:var(--text-secondary);font-size:12.5px;font-weight:600;
+}
+.quote-name{font-size:13.6px;font-weight:600;color:var(--text-primary);line-height:1.3}
+.quote-role{font-size:12px;color:var(--text-muted);margin-top:1px}
+
+/* ══════════════════════════════════════════════════════ RETRO ═══ */
+.retro{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+.retro-col{--rc:var(--c-aqua)}
+.retro-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--line-soft)}
+.retro-icon{
+  width:27px;height:27px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;
+  background:color-mix(in srgb,var(--rc) 18%,transparent);color:var(--rc);
+  border:1px solid color-mix(in srgb,var(--rc) 34%,transparent);
+}
+.retro-icon svg{width:14px;height:14px}
+.retro-title{font-size:13.4px;font-weight:600;letter-spacing:-.01em;color:var(--text-primary);line-height:1.3}
+.retro-sub{font-size:11px;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;margin-top:1px}
+.retro-notes{display:flex;flex-direction:column;gap:11px}
+.note{
+  background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius-sm);
+  padding:15px 16px 15px 17px;position:relative;overflow:hidden;
+  transition:transform .25s var(--ease),border-color .25s var(--ease);
+}
+.note::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--rc);opacity:.8}
+.note:hover{transform:translateY(-2px);border-color:var(--line)}
+.note-lead{font-size:14.2px;font-weight:600;letter-spacing:-.015em;color:var(--text-primary);margin-bottom:6px;line-height:1.4}
+.note-text{font-size:13.4px;color:var(--text-secondary);line-height:1.58}
+
+/* ══════════════════════════════════════ DEFINITION OF DONE ═══ */
+.dod{background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:8px 0;display:grid;grid-template-columns:repeat(2,1fr)}
+.dod-item{display:flex;gap:13px;align-items:flex-start;padding:16px 24px;transition:background .22s var(--ease)}
+.dod-item:hover{background:var(--surface-2)}
+.dod-check{
+  width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:1px;display:grid;place-items:center;
+  background:rgba(79,214,165,.13);border:1px solid rgba(79,214,165,.34);color:var(--accent);
+}
+.dod-check svg{width:12px;height:12px}
+.dod-text{font-size:14.2px;color:var(--text-secondary);line-height:1.55}
+.dod-text b{color:var(--text-primary);font-weight:600}
+
+/* ═══════════════════════════════ COMPETENCIAS VERIFICADAS ═══ */
+.verified{
+  margin-bottom:16px;padding:20px 22px;border-radius:var(--radius);
+  border:1px solid rgba(79,214,165,.24);background:rgba(79,214,165,.05);
+}
+.verified-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+.verified-title{display:flex;align-items:center;gap:8px;font-size:12.6px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.verified-title svg{width:14px;height:14px}
+.verified-note{font-size:12.4px;color:var(--text-muted)}
+.verified-note a{color:var(--text-secondary);border-bottom:1px solid var(--line);transition:color .2s,border-color .2s}
+.verified-note a:hover{color:var(--accent);border-color:var(--accent)}
+.verified-list{display:flex;flex-wrap:wrap;gap:8px}
+.vskill{
+  display:inline-flex;align-items:center;gap:7px;font-size:13.2px;font-weight:500;
+  padding:7px 13px 7px 11px;border-radius:8px;color:var(--text-primary);
+  background:var(--surface-2);border:1px solid rgba(79,214,165,.26);
+}
+.vskill svg{width:13px;height:13px;color:var(--accent);flex-shrink:0}
+
+/* ════════════════════════════════════════════════════ SKILLS ═══ */
+.skill-groups{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.skill-group{background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:22px}
+.skill-group h3{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:15px;font-weight:600}
+.skill-list{display:flex;flex-wrap:wrap;gap:7px}
+.skill{font-size:13px;padding:6px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--text-secondary);transition:.2s var(--ease)}
+.skill:hover{border-color:var(--accent-dim);color:var(--text-primary);transform:translateY(-1px)}
+
+/* ═════════════════════════════════════════════════ EDUCATION ═══ */
+.edu-list{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.edu{background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:22px}
+.edu-status{font-size:10.6px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;padding:3.5px 9px;border-radius:6px;display:inline-block;margin-bottom:13px}
+.edu-status.done{background:rgba(25,158,112,.14);color:var(--accent);border:1px solid rgba(25,158,112,.3)}
+.edu-status.wip{background:rgba(217,89,38,.13);color:#f0885c;border:1px solid rgba(217,89,38,.3)}
+.edu-status.cert{background:rgba(57,135,229,.13);color:#6fa9ee;border:1px solid rgba(57,135,229,.3)}
+.edu h3{font-size:15.2px;margin-bottom:7px;line-height:1.35}
+.edu p{font-size:13.2px;color:var(--text-muted)}
+
+/* ══════════════════════════════════════════════ CERTIFICACIONES ═══ */
+.certs{margin-top:16px;background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:22px 24px}
+.certs-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:16px}
+.certs-title{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.certs-link{font-size:12.6px;color:var(--text-muted);display:inline-flex;align-items:center;gap:6px;transition:color .2s}
+.certs-link:hover{color:var(--accent)}
+.certs-link svg{width:12px;height:12px}
+.certs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.cert-item{
+  background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);
+  padding:13px 15px;display:flex;align-items:flex-start;gap:11px;transition:border-color .2s var(--ease);
+}
+.cert-item:hover{border-color:var(--accent-dim)}
+.cert-ico{width:16px;height:16px;flex-shrink:0;margin-top:2px;color:var(--accent-dim)}
+.cert-n{font-size:13.2px;font-weight:500;color:var(--text-primary);line-height:1.35}
+.cert-o{font-size:11.6px;color:var(--text-muted);margin-top:3px}
+
+/* ══════════════════════════════════════════════════════ DAILY ═══ */
+.daily{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden}
+.daily-item{background:var(--surface-1);padding:24px;transition:background .22s var(--ease)}
+.daily-item:hover{background:var(--surface-2)}
+.daily-q{font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.daily-q svg{width:14px;height:14px;flex-shrink:0}
+.daily-a{font-size:14.2px;color:var(--text-secondary);line-height:1.6}
+.daily-a b{color:var(--text-primary);font-weight:600}
+
+/* ═══════════════════════════════════════════════════ CONTACT ═══ */
+.contact-box{background:linear-gradient(150deg,var(--surface-2),var(--surface-1));border:1px solid var(--line);border-radius:20px;padding:46px 40px;text-align:center;margin-top:22px}
+.contact-box h2{font-size:clamp(1.5rem,3.3vw,2rem);margin-bottom:13px;letter-spacing:-.03em}
+.contact-box > p{color:var(--text-secondary);font-size:15px;max-width:52ch;margin:0 auto 30px}
+.contact-links{display:flex;flex-wrap:wrap;gap:11px;justify-content:center}
+.contact-detail{display:flex;flex-wrap:wrap;gap:9px 26px;justify-content:center;margin-top:30px;padding-top:26px;border-top:1px solid var(--line-soft);font-size:13.2px;color:var(--text-muted)}
+.contact-detail span{display:flex;align-items:center;gap:7px}
+.contact-detail svg{width:14px;height:14px;opacity:.6}
+footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px}
+.foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;font-size:12.6px;color:var(--text-muted)}
+
+/* ══════════════════════════════════════════════════════ REVEAL ═══ */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease);transition-delay:var(--d,0ms)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+}
+
+/* ══════════════════════════════════════════════════ RESPONSIVE ═══ */
+@media (max-width:960px){
+  .board,.retro,.daily{grid-template-columns:1fr}
+  .retro{gap:32px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .edu-list,.dod{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+@media (max-width:760px){
+  .hero{padding:116px 0 36px}
+  .hero-grid{grid-template-columns:1fr;gap:32px}
+  .photo{width:124px;height:124px;order:-1}
+  .photo-mono{font-size:32px}
+  .photo-hint{display:none}
+  .hero-tagline{max-width:none}
+  .card-meta{flex-direction:column;align-items:flex-start;gap:2px}
+  .card-meta .sep{display:none}
+  .skill-groups{grid-template-columns:1fr}
+  .controls{flex-direction:column;align-items:stretch}
+  .view-switch{width:100%}
+  .view-switch button{flex:1;justify-content:center}
+  section{padding:44px 0}
+  .contact-box{padding:34px 22px}
+  .sprint-main{padding:20px}
+  .wrap{padding:0 18px}
+}
+@media (max-width:420px){
+  .kpis{grid-template-columns:1fr}
+  .brand-name{display:none}
+}
+
+/* ═══════════════════════════════════════════════════════ PRINT ═══ */
+@media print{
+  body{background:#fff;color:#000}
+  body::before,header,#progress,.controls,.photo-hint,.card-toggle,footer,.hero-cta,.sprint-top{display:none!important}
+  html[data-view] #view-board{display:none!important}
+  html[data-view] #view-timeline{display:block!important}
+  .card-body{grid-template-rows:1fr!important}
+  .card,.kpi,.skill-group,.edu,.contact-box,.note,.dod,.daily-item,.sprint,.quote,.certs,.cert-item,.verified,.vskill{border:1px solid #ccc;background:#fff}
+  .hero{padding:0}
+  section{padding:18px 0;break-inside:avoid}
+  .card,.note,.retro-col{break-inside:avoid}
+  h1,h2,h3,.card-role,.kpi-value,.note-lead,.sprint-goal{color:#000}
+  p,li,.card-meta,.kpi-label,.note-text,.dod-text,.daily-a{color:#333}
+}
+</style>
+</head>
+
+<body>
+<div id="progress"></div>
+
+<!-- ══════════════════════════════════════════════════════ NAV ═══ -->
+<header id="site-header">
+  <div class="wrap nav">
+    <a href="#top" class="brand">
+      <span class="brand-mark">GB</span>
+      <span class="brand-name">Gustavo Bilhalva</span>
+    </a>
+    <nav class="nav-links" id="navlinks">
+      <a href="#review" data-i18n="nav.review"></a>
+      <a href="#retro" data-i18n="nav.retro"></a>
+      <a href="#dod" data-i18n="nav.dod"></a>
+      <a href="#backlog" data-i18n="nav.skills"></a>
+      <a href="#refinement" data-i18n="nav.refinement"></a>
+      <a href="#daily" data-i18n="nav.contact"></a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang-switch" role="group" aria-label="Idioma / Language">
+        <button data-lang="es" aria-pressed="true">ES</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ═════════════════════════════════════════════════════ HERO ═══ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badges" id="heroBadges"></div>
+        <h1>Gustavo Andrés <span class="light">Bilhalva</span></h1>
+        <p class="hero-role" data-i18n="hero.role"></p>
+        <p class="hero-tagline" data-i18n="hero.tagline"></p>
+        <p class="hero-summary" data-i18n="hero.summary"></p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="mailto:gustavobilhalva@gmail.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+            <span data-i18n="hero.cta1"></span>
+          </a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/gustavo-bilhalva" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45z"/></svg>
+            LinkedIn
+          </a>
+          <span id="cvBtn"></span>
+        </div>
+      </div>
+
+      <!-- ══ FOTO AQUÍ ══
+           Reemplazá el contenido de este div por:
+           <img src="foto.jpg" alt="Gustavo Bilhalva"> -->
+      <div class="photo">
+        <span class="photo-mono">GB</span>
+        <span class="photo-hint" data-i18n="hero.photoHint"></span>
+      </div>
+    </div>
+
+    <div class="kpis reveal" id="kpis"></div>
+
+    <!-- Encabezado de sprint -->
+    <div class="sprint reveal" id="sprint"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ SPRINT REVIEW ═══ -->
+<section id="review">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">Sprint Review</span>
+      <h2 data-i18n="review.title"></h2>
+      <p data-i18n="review.intro"></p>
+      <p class="ceremony" data-i18n="review.ceremony"></p>
+    </div>
+
+    <div class="controls reveal">
+      <div class="filters" id="filters"></div>
+      <div class="view-switch" role="group" aria-label="Vista">
+        <button data-view="timeline" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/></svg>
+          <span data-i18n="review.viewTimeline"></span>
+        </button>
+        <button data-view="board" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="14" rx="1"/></svg>
+          <span data-i18n="review.viewBoard"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="view-timeline"><div class="timeline" id="timeline"></div></div>
+    <div id="view-board"><div class="board" id="board"></div></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FEEDBACK / TESTIMONIOS ═══
+     Esta sección se oculta sola mientras DATA.testimonials esté vacío. -->
+<section id="feedback" hidden>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">Stakeholder Feedback</span>
+      <h2 data-i18n="fb.title"></h2>
+      <p data-i18n="fb.intro"></p>
+    </div>
+    <div class="quotes reveal" id="quotes"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ RETROSPECTIVE ═══ -->
+<section id="retro">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">Retrospective</span>
+      <h2 data-i18n="retro.title"></h2>
+      <p data-i18n="retro.intro"></p>
+      <p class="ceremony" data-i18n="retro.ceremony"></p>
+    </div>
+    <div class="retro" id="retroBoard"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ DEFINITION OF DONE ═══ -->
+<section id="dod">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">Definition of Done</span>
+      <h2 data-i18n="dod.title"></h2>
+      <p data-i18n="dod.intro"></p>
+      <p class="ceremony" data-i18n="dod.ceremony"></p>
+    </div>
+    <div class="dod reveal" id="dodList"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ SPRINT BACKLOG ═══ -->
+<section id="backlog">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">Sprint Backlog</span>
+      <h2 data-i18n="skills.title"></h2>
+      <p data-i18n="skills.intro"></p>
+    </div>
+    <div class="verified reveal" id="verified"></div>
+    <div class="skill-groups reveal" id="skills"></div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════ REFINEMENT ═══ -->
+<section id="refinement">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">Refinement</span>
+      <h2 data-i18n="edu.title"></h2>
+      <p data-i18n="edu.intro"></p>
+    </div>
+    <div class="edu-list reveal" id="edu"></div>
+    <div class="certs reveal" id="certs"></div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════ DAILY + CONTACTO ═══ -->
+<section id="daily">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">Daily Standup</span>
+      <h2 data-i18n="daily.title"></h2>
+      <p data-i18n="daily.intro"></p>
+    </div>
+    <div class="daily reveal" id="dailyBoard"></div>
+
+    <div class="contact-box reveal">
+      <h2 data-i18n="contact.title"></h2>
+      <p data-i18n="contact.intro"></p>
+      <div class="contact-links">
+        <a class="btn btn-primary" href="mailto:gustavobilhalva@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          gustavobilhalva@gmail.com
+        </a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/gustavo-bilhalva" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45z"/></svg>
+          <span data-i18n="contact.linkedin"></span>
+        </a>
+      </div>
+      <div class="contact-detail">
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+          +54 9 11 3592 6939
+        </span>
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span data-i18n="contact.place"></span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="year"></span> Gustavo Andrés Bilhalva</span>
+    <span data-i18n="footer.note"></span>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   DATA — todo el contenido editable vive acá.
+   ══════════════════════════════════════════════════════════════════ */
+const DATA = {
+
+  /* ─── Disponibilidad y CV ───────────────────────────────────────
+     available: poné false cuando dejes de buscar y el pill desaparece.
+     cvFile: nombre del PDF que subas JUNTO a este index.html. Si lo
+     dejás en null, el botón "Descargar CV" no se muestra.            */
+  available: true,
+  availableEs: "Disponible para nuevos proyectos",
+  availableEn: "Available for new projects",
+  cvFileEs: "CV-Gustavo-Bilhalva.docx",
+  cvFileEn: "CV-Gustavo-Bilhalva-EN.docx",
+
+  /* ─── Certificaciones (Credly) ──────────────────────────────────
+     Perfil completo: credly.com/users/gustavo-bilhalva            */
+  credly: "https://www.credly.com/users/gustavo-bilhalva",
+  certs: [
+    { n:"IBM Explorer Project Manager",            org:"IBM", y:"2023" },
+    { n:"IBM Agile Achiever · Advanced",           org:"IBM Agile Academy", y:"2021" },
+    { n:"Enterprise Design Thinking Practitioner", org:"IBM", y:"2022" },
+    { n:"IBM Garage Essentials",                   org:"IBM", y:"2022" },
+    { n:"IBM Consulting · Building Teams",         org:"IBM Consulting Profession", y:"2021" },
+    { n:"AWS Certified Cloud Practitioner",        org:"Amazon Web Services", y:"2027" },
+    { n:"Architectural Thinking",                  org:"IBM", y:"2022" },
+    { n:"IBM watsonx Essentials",                  org:"IBM", y:"2024" },
+    { n:"IBM watsonx.ai Technical Essentials",     org:"IBM", y:"2024" }
+  ],
+
+  /* ─── Competencias verificadas por Credly ───────────────────────
+     Credly las valida contra las insignias que ya obtuviste, así que
+     no son autoevaluación: son verificables por un tercero.
+     Tu wallet tiene 91. Estas son las 8 con más evidencia Y más
+     relevantes al rol (entre paréntesis, las fuentes de evidencia
+     que tenían al 20/08/2026 — van a subir cuando abras las 5
+     insignias privadas):
+       Agile Management (5) · Team Management (4) · Scrum (3)
+       Kanban Principles (3) · Collaboration (3) · Design Thinking (3)
+       Discussion Facilitation (2) · Leadership (2)                  */
+  verified: [
+    "Agile Management", "Team Management", "Scrum", "Kanban Principles",
+    "Collaboration", "Design Thinking", "Discussion Facilitation", "Leadership"
+  ],
+  verifiedTotal: 91,
+
+  /* ═══════════════════════════════════════════════════════════════
+     TESTIMONIOS — vacío por ahora, así la sección se oculta sola.
+     Cuando consigas las citas, agregalas con este formato:
+
+       testimonials: [
+         {
+           es: "Gustavo entró a un equipo que venía atrasado y en tres
+                meses cambió la conversación entera.",
+           en: "Gustavo joined a team that was behind schedule and in
+                three months changed the whole conversation.",
+           name: "Nombre Apellido",
+           roleEs: "Product Owner · IBM",
+           roleEn: "Product Owner · IBM"
+         }
+       ]
+
+     Pedilas por LinkedIn: dos o tres líneas de un PO, un dev de tu
+     equipo en IBM o un cliente de Zarego alcanzan.
+     ═══════════════════════════════════════════════════════════════ */
+  testimonials: [],
+
+  /* ─── Encabezado de sprint ──────────────────────────────────────
+     ⚠ El "goal" es un borrador. Cambialo por tu propia frase.        */
+  sprint: {
+    id: "GB · SPRINT 01",
+    statusEs: "Sprint en curso", statusEn: "Sprint in progress",
+    goalLabelEs: "Objetivo del sprint", goalLabelEn: "Sprint goal",
+    goalEs: "Construir equipos que puedan sostener el cambio sin mí.",
+    goalEn: "Build teams that can sustain change without me.",
+    facts: [
+      { kEs:"Inicio",     kEn:"Started",   vEs:"Julio 2011",            vEn:"July 2011" },
+      { kEs:"Duración",   kEn:"Duration",  vEs:"15 años · en curso",    vEn:"15 years · ongoing" },
+      { kEs:"Increments", kEn:"Increments",vEs:"4 organizaciones",      vEn:"4 organisations" },
+      { kEs:"Rol actual", kEn:"Current role", vEs:"Agile PM & Scrum Consultant", vEn:"Agile PM & Scrum Consultant" }
+    ]
+  },
+
+  /* ─── KPIs ──────────────────────────────────────────────────────── */
+  kpis: [
+    { value:"15", unit:"+", es:"años en tecnología", en:"years in technology",
+      noteEs:"desde 2011", noteEn:"since 2011" },
+    { value:"8",  unit:"",  es:"años de background técnico", en:"years of hands-on engineering",
+      noteEs:"developer antes que manager", noteEn:"developer before manager" },
+    { value:"4",  unit:"",  es:"equipos coordinados en simultáneo", en:"teams coordinated at once",
+      noteEs:"liderazgo técnico en IBM", noteEn:"technical leadership at IBM" },
+    { value:"PSM", unit:"II", text:true, es:"certificación Scrum.org", en:"Scrum.org certification",
+      noteEs:"Professional Scrum Master", noteEn:"Professional Scrum Master" }
+  ],
+
+  /* ─── Fases de carrera (columnas del tablero) ───────────────────── */
+  phases: [
+    { id:"tecnica",    color:"var(--phase-tecnica)",    years:"2011 – 2019", es:"Base técnica",   en:"Engineering foundation" },
+    { id:"transicion", color:"var(--phase-transicion)", years:"2019 – 2020", es:"Transición",     en:"Transition" },
+    { id:"agil",       color:"var(--phase-agil)",       years:"2020 – hoy",  es:"Liderazgo ágil", en:"Agile leadership" }
+  ],
+
+  tags: {
+    scrum:        { es:"Scrum & Kanban", en:"Scrum & Kanban" },
+    liderazgo:    { es:"Liderazgo",      en:"Leadership" },
+    metricas:     { es:"Métricas",       en:"Metrics" },
+    stakeholders: { es:"Stakeholders",   en:"Stakeholders" },
+    tecnico:      { es:"Técnico",        en:"Engineering" }
+  },
+
+  /* ─── EXPERIENCIA (Sprint Review) ───────────────────────────────── */
+  jobs: [
+    {
+      org:"Zarego", phase:"agil",
+      es:{ role:"Agile Project Manager & Scrum Consultant", period:"Ene 2026 – Actualidad", place:"Argentina", current:"Actual" },
+      en:{ role:"Agile Project Manager & Scrum Consultant", period:"Jan 2026 – Present",    place:"Argentina", current:"Current" },
+      tags:["scrum","liderazgo","stakeholders"],
+      metrics:[],
+      bullets:{
+        es:[
+          "Implementación y mejora de prácticas Scrum adaptadas a contextos reales de negocio, no a manuales.",
+          "Identificación y remoción de impedimentos tanto a nivel equipo como organizacional.",
+          "Optimización del flujo de trabajo y mejora de la previsibilidad en la entrega.",
+          "Facilitación de eventos ágiles (Planning, Daily, Review, Retrospective) con foco en resultados concretos.",
+          "Alineación entre equipos técnicos y stakeholders para acelerar la toma de decisiones.",
+          "Coaching a equipos para fortalecer su autonomía, su foco y su capacidad de mejora continua."
+        ],
+        en:[
+          "Implementation and refinement of Scrum practices adapted to real business contexts, not to textbooks.",
+          "Identification and removal of impediments at both team and organisational level.",
+          "Workflow optimisation and improved delivery predictability.",
+          "Facilitation of agile events (Planning, Daily, Review, Retrospective) focused on concrete outcomes.",
+          "Alignment between engineering teams and stakeholders to speed up decision-making.",
+          "Coaching teams to strengthen autonomy, focus and continuous improvement."
+        ]
+      }
+    },
+    {
+      org:"IBM", phase:"agil",
+      es:{ role:"Agile Project Manager & Scrum Master", period:"Sep 2020 – Dic 2025", place:"Buenos Aires, Argentina" },
+      en:{ role:"Agile Project Manager & Scrum Master", period:"Sep 2020 – Dec 2025", place:"Buenos Aires, Argentina" },
+      tags:["scrum","liderazgo","metricas","stakeholders"],
+      metrics:[],
+      bullets:{
+        es:[
+          "Líder técnico de un equipo y supervisión de la productividad de otros tres, garantizando el cumplimiento de contratos y SLA.",
+          "Planificación y priorización de backlog, estimación con story points y facilitación de las ceremonias ágiles.",
+          "Remoción de bloqueos, gestión de dependencias y monitoreo de métricas (velocity, burndown) para impulsar la mejora continua.",
+          "Funciones de Project Manager: entrevistas para el programa Students, definición de objetivos para contratos y alineación estratégica con el cliente.",
+          "Definición de OKRs en conjunto con la PMO."
+        ],
+        en:[
+          "Technical lead of one team and oversight of three more, ensuring contract and SLA compliance.",
+          "Backlog planning and prioritisation, story-point estimation and facilitation of all agile ceremonies.",
+          "Removal of blockers, dependency management and monitoring of metrics (velocity, burndown) to drive continuous improvement.",
+          "Project Manager duties: interviews for the Students program, definition of contract objectives and strategic alignment with the client.",
+          "OKR definition together with the PMO."
+        ]
+      }
+    },
+    {
+      org:"VISMA", phase:"transicion",
+      es:{ role:"Smalltalk Developer & Scrum Master Support", period:"Mar 2019 – Sep 2020", place:"Buenos Aires, Argentina" },
+      en:{ role:"Smalltalk Developer & Scrum Master Support", period:"Mar 2019 – Sep 2020", place:"Buenos Aires, Argentina" },
+      tags:["tecnico","scrum","stakeholders"],
+      metrics:[],
+      bullets:{
+        es:[
+          "Migración exitosa de la aplicación central de nómina de VSE a VAST: diseño y desarrollo de los módulos de conversión.",
+          "Trabajo directo con stakeholders en Noruega, asegurando que los requerimientos de negocio y las soluciones técnicas quedaran alineados.",
+          "Soporte a la adopción ágil (Scrum), promoviendo un flujo de trabajo iterativo y colaborativo."
+        ],
+        en:[
+          "Successful migration of the core payroll application from VSE to VAST: design and development of the conversion modules.",
+          "Direct work with stakeholders in Norway, keeping business requirements and technical solutions aligned.",
+          "Support for agile (Scrum) adoption, promoting an iterative and collaborative workflow."
+        ]
+      }
+    },
+    {
+      org:"Telecom", phase:"tecnica",
+      es:{ role:"Software Developer", period:"Jul 2011 – Feb 2019", place:"Buenos Aires, Argentina" },
+      en:{ role:"Software Developer", period:"Jul 2011 – Feb 2019", place:"Buenos Aires, Argentina" },
+      tags:["tecnico"],
+      metrics:[],
+      bullets:{
+        es:[
+          "Desarrollo y mejora de funcionalidades del Sistema de Inventario de Red usando Smalltalk.",
+          "GemStone como base de datos orientada a objetos y repositorio de código sobre Linux.",
+          "VisualAge y Condis (sistema Siemens basado en VisualWorks) como entornos principales.",
+          "Automatización de procesos con Shell Scripting en Unix."
+        ],
+        en:[
+          "Development and enhancement of the Network Inventory System using Smalltalk.",
+          "GemStone as object-oriented database and code repository on Linux.",
+          "VisualAge and Condis (a Siemens system based on VisualWorks) as main environments.",
+          "Process automation with Shell Scripting on Unix."
+        ]
+      }
+    }
+  ],
+
+  /* ═══════════════════════════════════════════════════════════════
+     ⚠⚠ RETROSPECTIVA — BORRADOR ⚠⚠
+     Escrito a partir de tu CV, en tu voz, para que tengas algo
+     concreto que editar. Cambiá, borrá o reescribí sin culpa: esta
+     es la sección donde tenés que sonar a vos.
+     ═══════════════════════════════════════════════════════════════ */
+  retro: [
+    {
+      key:"wentwell", color:"var(--c-aqua)", icon:"check",
+      es:{ title:"Qué funcionó", sub:"What went well" },
+      en:{ title:"What went well", sub:"Lo que funcionó" },
+      notes:[
+        { es:{ lead:"Aprender el oficio desde el código",
+               text:"Ocho años desarrollando me dieron algo que ningún curso da: cuando un equipo dice “esto es más complejo de lo que parece”, sé si es cierto." },
+          en:{ lead:"Learning the craft from the code",
+               text:"Eight years as a developer gave me something no course does: when a team says “this is more complex than it looks”, I know whether it's true." } },
+        { es:{ lead:"Quedarme cinco años en IBM",
+               text:"Los cambios profundos en cómo trabaja un equipo no se ven en un trimestre. Se ven cuando te quedás el tiempo suficiente para sostenerlos." },
+          en:{ lead:"Staying five years at IBM",
+               text:"Deep changes in how a team works don't show up in a quarter. They show up when you stay long enough to sustain them." } },
+        { es:{ lead:"Trabajar con stakeholders en Noruega",
+               text:"Aprendí que la distancia y el idioma no son el problema. El problema es asumir que el otro entendió lo mismo que vos." },
+          en:{ lead:"Working with stakeholders in Norway",
+               text:"I learned that distance and language aren't the problem. The problem is assuming the other person understood the same thing you did." } },
+        { es:{ lead:"Medir para conversar, no para reportar",
+               text:"Velocity y burndown sirven cuando abren una charla en la retro. No cuando alguien los mira en un dashboard y saca conclusiones solo." },
+          en:{ lead:"Measuring to talk, not to report",
+               text:"Velocity and burndown are useful when they open a conversation in the retro. Not when someone stares at a dashboard and draws conclusions alone." } }
+      ]
+    },
+    {
+      key:"change", color:"var(--c-orange)", icon:"loop",
+      es:{ title:"Qué haría distinto", sub:"What I'd change" },
+      en:{ title:"What I'd change", sub:"Qué haría distinto" },
+      notes:[
+        { es:{ lead:"Tardé en soltar el teclado",
+               text:"Al principio resolvía yo los problemas técnicos del equipo. Era más rápido, sí, y le quitaba al equipo la oportunidad de aprender a resolverlos." },
+          en:{ lead:"I took too long to let go of the keyboard",
+               text:"At first I solved the team's technical problems myself. It was faster — and it took away their chance to learn to solve them." } },
+        { es:{ lead:"Subestimé el trabajo político",
+               text:"Alinear a un stakeholder es tan parte del rol como facilitar una planning. Durante un tiempo lo traté como una interrupción del trabajo real." },
+          en:{ lead:"I underestimated the political work",
+               text:"Aligning a stakeholder is as much part of the role as facilitating a planning. For a while I treated it as an interruption of the real work." } },
+        { es:{ lead:"Confié demasiado en la ceremonia",
+               text:"Hacer la retro no garantiza que el equipo mejore. Lo que importa es qué pasa el lunes con lo que salió de ahí." },
+          en:{ lead:"I trusted the ceremony too much",
+               text:"Running the retro doesn't guarantee the team improves. What matters is what happens on Monday with whatever came out of it." } }
+      ]
+    },
+    {
+      key:"keep", color:"var(--c-blue)", icon:"arrow",
+      es:{ title:"Qué sostengo", sub:"What I keep doing" },
+      en:{ title:"What I keep doing", sub:"Qué sostengo" },
+      notes:[
+        { es:{ lead:"Remover impedimentos antes que asignar tareas",
+               text:"Mi trabajo es que el camino esté despejado, no decidir por dónde camina el equipo." },
+          en:{ lead:"Removing impediments before assigning tasks",
+               text:"My job is to keep the path clear, not to decide which way the team walks." } },
+        { es:{ lead:"Adaptar Scrum al contexto, no el contexto a Scrum",
+               text:"El marco es una herramienta, no una religión. Si una práctica no le sirve a este equipo, se discute y se cambia." },
+          en:{ lead:"Adapting Scrum to the context, not the context to Scrum",
+               text:"The framework is a tool, not a religion. If a practice doesn't serve this team, we discuss it and change it." } },
+        { es:{ lead:"Preguntar antes de proponer",
+               text:"Casi siempre el equipo ya sabe cuál es el problema. Lo que falta no es una solución mía: es espacio para decirlo." },
+          en:{ lead:"Asking before proposing",
+               text:"The team almost always already knows what the problem is. What's missing isn't my solution — it's room to say it." } },
+        { es:{ lead:"Volver a formarme",
+               text:"Empecé la Licenciatura en Ciencias de Datos a los quince años de carrera, porque entender los datos es la próxima forma de entender a los equipos." },
+          en:{ lead:"Going back to study",
+               text:"I started a Data Science degree fifteen years into my career, because understanding data is the next way of understanding teams." } }
+      ]
+    }
+  ],
+
+  /* ⚠ DEFINITION OF DONE — también borrador. Editá a gusto. */
+  dod: [
+    { es:{ b:"El equipo puede sostener el cambio sin mí.", t:"Si la mejora depende de que yo esté en la sala, no está terminada." },
+      en:{ b:"The team can sustain the change without me.", t:"If the improvement depends on me being in the room, it isn't done." } },
+    { es:{ b:"Las métricas abren conversaciones.", t:"Un número que nadie discute en la retro es un número que no sirve." },
+      en:{ b:"Metrics open conversations.", t:"A number nobody discusses in the retro is a number that isn't working." } },
+    { es:{ b:"El stakeholder entendió lo mismo que el equipo.", t:"No alcanza con que ambos hayan estado en la reunión." },
+      en:{ b:"The stakeholder understood the same thing the team did.", t:"Both being in the meeting isn't enough." } },
+    { es:{ b:"El impedimento no vuelve en la retro siguiente.", t:"Si reaparece, lo que removí fue el síntoma." },
+      en:{ b:"The impediment doesn't come back next retro.", t:"If it reappears, what I removed was the symptom." } },
+    { es:{ b:"La decisión quedó donde el equipo la va a buscar.", t:"Una decisión que hay que preguntar dos veces no está documentada." },
+      en:{ b:"The decision lives where the team will look for it.", t:"A decision you have to ask about twice isn't documented." } },
+    { es:{ b:"Nadie se enteró de un cambio de alcance por sorpresa.", t:"Las malas noticias viajan temprano o no sirven." },
+      en:{ b:"Nobody found out about a scope change by surprise.", t:"Bad news travels early or it doesn't travel at all." } }
+  ],
+
+  /* ⚠ DAILY — actualizá esto cuando cambie tu situación. */
+  daily: [
+    { icon:"back",
+      es:{ q:"¿Qué hice?", a:"Cinco años en <b>IBM</b> liderando un equipo y supervisando otros tres, con contratos y SLA exigentes. Antes, ocho años construyendo software en <b>Telecom</b> y <b>VISMA</b>." },
+      en:{ q:"What did I do?", a:"Five years at <b>IBM</b> leading one team and overseeing three more, under demanding contracts and SLAs. Before that, eight years building software at <b>Telecom</b> and <b>VISMA</b>." } },
+    { icon:"play",
+      es:{ q:"¿Qué estoy haciendo?", a:"<b>Agile Project Manager & Scrum Consultant en Zarego</b>, implementando prácticas ágiles en contextos reales de negocio. En paralelo, cursando la <b>Licenciatura en Ciencias de Datos</b>." },
+      en:{ q:"What am I doing?", a:"<b>Agile Project Manager & Scrum Consultant at Zarego</b>, implementing agile practices in real business contexts. In parallel, studying for a <b>BSc in Data Science</b>." } },
+    { icon:"block",
+      es:{ q:"¿Qué me bloquea?", a:"Nada por ahora. Estoy <b>abierto a escuchar propuestas</b> de Agile Project Manager, Scrum Master o consultoría ágil. Si tenés un equipo que necesita destrabarse, escribime." },
+      en:{ q:"Any blockers?", a:"None right now. I'm <b>open to hearing about opportunities</b> in Agile Project Management, Scrum Mastery or agile consulting. If you have a team that needs unblocking, get in touch." } }
+  ],
+
+  /* ─── COMPETENCIAS (Sprint Backlog) ─────────────────────────────── */
+  skills: [
+    { es:"Agilidad y entrega", en:"Agility & delivery", items:[
+      { es:"Scrum", en:"Scrum" },
+      { es:"Kanban", en:"Kanban" },
+      { es:"Facilitación", en:"Facilitation" },
+      { es:"Gestión de backlog", en:"Backlog management" },
+      { es:"Estimación con story points", en:"Story-point estimation" },
+      { es:"Gestión de dependencias", en:"Dependency management" },
+      { es:"Mejora continua", en:"Continuous improvement" }
+    ]},
+    { es:"Gestión de proyectos", en:"Project management", items:[
+      { es:"Project Management", en:"Project management" },
+      { es:"OKRs", en:"OKRs" },
+      { es:"SLA y contratos", en:"SLAs & contracts" },
+      { es:"Lead time y cycle time", en:"Lead time & cycle time" },
+      { es:"Velocity y burndown", en:"Velocity & burndown" },
+      { es:"Previsibilidad de entrega", en:"Delivery predictability" },
+      { es:"Design Thinking", en:"Design Thinking" },
+      { es:"Alineación con PMO", en:"PMO alignment" }
+    ]},
+    { es:"Liderazgo y personas", en:"Leadership & people", items:[
+      { es:"Coaching de equipos", en:"Team coaching" },
+      { es:"Liderazgo técnico", en:"Technical leadership" },
+      { es:"Gestión de stakeholders", en:"Stakeholder management" },
+      { es:"Entrevistas y selección", en:"Interviewing & hiring" },
+      { es:"Autonomía de equipos", en:"Team autonomy" }
+    ]},
+    { es:"Base técnica", en:"Engineering background", items:[
+      { es:"Smalltalk", en:"Smalltalk" },
+      { es:"Java", en:"Java" },
+      { es:".NET", en:".NET" },
+      { es:"GemStone (NoSQL/OO)", en:"GemStone (NoSQL/OO)" },
+      { es:"Diseño orientado a objetos", en:"Object-oriented design" },
+      { es:"UML", en:"UML" },
+      { es:"Shell scripting (Unix)", en:"Shell scripting (Unix)" },
+      { es:"VisualAge / VisualWorks", en:"VisualAge / VisualWorks" }
+    ]}
+  ],
+
+  /* ─── FORMACIÓN (Refinement) ────────────────────────────────────── */
+  edu: [
+    { status:"cert", statusEs:"Certificación", statusEn:"Certification",
+      es:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org" },
+      en:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org" } },
+    { status:"done", statusEs:"Finalizado", statusEn:"Completed",
+      es:{ t:"Tecnicatura Superior en Programación", s:"Teclab · Instituto Técnico Superior" },
+      en:{ t:"Higher Technical Degree in Programming", s:"Teclab · Instituto Técnico Superior" } },
+    { status:"wip", statusEs:"En curso", statusEn:"In progress",
+      es:{ t:"Licenciatura en Ciencias de Datos", s:"Universidad de la Ciudad (UdelaCiudad)" },
+      en:{ t:"BSc in Data Science", s:"Universidad de la Ciudad (UdelaCiudad)" } }
+  ]
+};
+
+/* ─── Textos de interfaz ─────────────────────────────────────────── */
+const I18N = {
+  es:{
+    "nav.review":"Sprint Review","nav.retro":"Retrospective","nav.dod":"Definition of Done",
+    "nav.skills":"Sprint Backlog","nav.refinement":"Refinement","nav.contact":"Daily",
+    "hero.location":"Avellaneda · Buenos Aires · Argentina",
+    "hero.role":"Agile Project Manager & Scrum Master · PSM II",
+    "hero.tagline":"De construir software a liderar a quienes lo construyen.",
+    "hero.summary":"Lidero equipos ágiles y gestiono proyectos tecnológicos articulando las necesidades del negocio con la ejecución real de los equipos. Especialista en Scrum y Kanban, con foco en facilitación, gestión de dependencias, seguimiento de métricas y mejora continua. Ocho años como developer me dieron algo que no se aprende en un curso: entender los contextos complejos desde adentro y acompañar a los equipos con criterio técnico propio.",
+    "hero.cta1":"Hablemos",
+    "hero.cta2":"Descargar CV",
+    "hero.photoHint":"Foto pendiente",
+
+    "fb.title":"Lo que dicen los equipos",
+    "fb.intro":"En una Review el feedback no lo da quien construyó: lo dan quienes recibieron el trabajo. Estas son sus palabras.",
+
+    "review.title":"Lo que entregué",
+    "review.intro":"Quince años, dos oficios: empecé escribiendo código y terminé cuidando el proceso que lo hace posible. Explorá la trayectoria como línea de tiempo o como tablero — los mismos datos, dos formas de leerlos. Hacé click en cualquier tarjeta para ver el detalle.",
+    "review.ceremony":"En una Review no se muestra lo que se planeó: se muestra lo que efectivamente se construyó.",
+    "review.filterLabel":"Filtrar por:",
+    "review.viewTimeline":"Línea de tiempo",
+    "review.viewBoard":"Tablero",
+    "review.all":"Todo",
+    "review.noItems":"Sin resultados para este filtro",
+
+    "retro.title":"Lo que aprendí",
+    "retro.intro":"Un CV lista logros. Una retrospectiva es más honesta: incluye lo que salió mal. Estas son las conclusiones de quince años de sprints, ordenadas como las ordenaría cualquier equipo.",
+    "retro.ceremony":"La retro es el único evento donde el equipo se mira a sí mismo en lugar de mirar el producto.",
+
+    "dod.title":"Cómo trabajo",
+    "dod.intro":"Un equipo acuerda cuándo algo está terminado para no discutirlo caso por caso. Esta es la mía: los criterios que uso para saber si mi trabajo con un equipo realmente terminó.",
+    "dod.ceremony":"Sin una Definition of Done compartida, «listo» significa una cosa distinta para cada persona.",
+
+    "skills.title":"Lo que traigo a un equipo",
+    "skills.intro":"Un set poco habitual: el vocabulario de la agilidad y la gestión, sostenido por una base técnica real.",
+    "skills.verifiedTitle":"Verificadas por un tercero",
+    "skills.verifiedNote":"{k} de las {n} competencias respaldadas por insignias en mi perfil de",
+
+    "edu.title":"Formación continua",
+    "edu.intro":"Lo que sigue en el backlog personal: nunca dejó de refinarse.",
+    "edu.certsTitle":"Otras certificaciones",
+    "edu.certsLink":"Ver todas verificadas en Credly",
+
+    "daily.title":"En qué estoy hoy",
+    "daily.intro":"Las tres preguntas de cualquier daily, respondidas sobre mi propia carrera.",
+
+    "contact.title":"¿Armamos el próximo sprint?",
+    "contact.intro":"Estoy abierto a conversar sobre roles de Agile Project Manager, Scrum Master o consultoría ágil. Escribime y coordinamos una charla.",
+    "contact.linkedin":"Ver perfil de LinkedIn",
+    "contact.place":"Avellaneda, Buenos Aires, Argentina",
+    "footer.note":"Hecho a mano · Actualizado en 2026"
+  },
+  en:{
+    "nav.review":"Sprint Review","nav.retro":"Retrospective","nav.dod":"Definition of Done",
+    "nav.skills":"Sprint Backlog","nav.refinement":"Refinement","nav.contact":"Daily",
+    "hero.location":"Avellaneda · Buenos Aires · Argentina",
+    "hero.role":"Agile Project Manager & Scrum Master · PSM II",
+    "hero.tagline":"From building software to leading the people who build it.",
+    "hero.summary":"I lead agile teams and manage technology projects, connecting business needs with how teams actually deliver. Specialist in Scrum and Kanban, focused on facilitation, dependency management, metrics tracking and continuous improvement. Eight years as a developer gave me something no course teaches: understanding complex contexts from the inside and guiding teams with real technical judgement.",
+    "hero.cta1":"Get in touch",
+    "hero.cta2":"Download CV",
+    "hero.photoHint":"Photo pending",
+
+    "fb.title":"What teams say",
+    "fb.intro":"In a Review, feedback doesn't come from whoever built it — it comes from the people who received the work. These are their words.",
+
+    "review.title":"What I delivered",
+    "review.intro":"Fifteen years, two crafts: I started writing code and ended up caring for the process that makes it possible. Explore my career as a timeline or as a board — same data, two ways to read it. Click any card for the detail.",
+    "review.ceremony":"A Review doesn't show what was planned. It shows what was actually built.",
+    "review.filterLabel":"Filter by:",
+    "review.viewTimeline":"Timeline",
+    "review.viewBoard":"Board",
+    "review.all":"All",
+    "review.noItems":"No results for this filter",
+
+    "retro.title":"What I learned",
+    "retro.intro":"A CV lists achievements. A retrospective is more honest: it includes what went wrong. These are the conclusions from fifteen years of sprints, sorted the way any team would sort them.",
+    "retro.ceremony":"The retro is the only event where the team looks at itself instead of at the product.",
+
+    "dod.title":"How I work",
+    "dod.intro":"A team agrees on when something is done so it doesn't have to argue case by case. Here's mine: the criteria I use to know whether my work with a team is actually finished.",
+    "dod.ceremony":"Without a shared Definition of Done, “done” means something different to every person.",
+
+    "skills.title":"What I bring to a team",
+    "skills.intro":"An uncommon mix: the vocabulary of agility and management, backed by a real engineering foundation.",
+    "skills.verifiedTitle":"Third-party verified",
+    "skills.verifiedNote":"{k} of the {n} badge-backed skills on my profile at",
+
+    "edu.title":"Continuous learning",
+    "edu.intro":"What's next in the personal backlog — it never stopped being refined.",
+    "edu.certsTitle":"Other certifications",
+    "edu.certsLink":"See all verified on Credly",
+
+    "daily.title":"Where I am today",
+    "daily.intro":"The three questions of any daily, answered about my own career.",
+
+    "contact.title":"Shall we plan the next sprint?",
+    "contact.intro":"I'm open to conversations about Agile Project Manager, Scrum Master or agile consulting roles. Drop me a line and let's talk.",
+    "contact.linkedin":"View LinkedIn profile",
+    "contact.place":"Avellaneda, Buenos Aires, Argentina",
+    "footer.note":"Handcrafted · Updated 2026"
+  }
+};
+
+/* ══════════════════════════════════════════════════════ ICONOS ═══ */
+const ICONS = {
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  loop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg>',
+  block:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>'
+};
+
+/* ══════════════════════════════════════════════════════ RENDER ═══ */
+let lang = 'es';
+let filter = 'all';
+const openState = new Set();
+const t = k => (I18N[lang][k] ?? k);
+const L = o => (lang === 'es' ? o.es : o.en);
+
+function renderHeroBadges(){
+  const loc = `<span class="eyebrow">${t('hero.location')}</span>`;
+  const pill = DATA.available
+    ? `<span class="avail"><span class="dot"></span>${lang==='es'?DATA.availableEs:DATA.availableEn}</span>`
+    : '';
+  document.getElementById('heroBadges').innerHTML = pill + loc;
+
+  const cv = lang === 'es' ? DATA.cvFileEs : DATA.cvFileEn;
+  document.getElementById('cvBtn').innerHTML = cv
+    ? `<a class="btn btn-ghost" href="${cv}" download>
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+         ${t('hero.cta2')}
+       </a>` : '';
+}
+
+function renderQuotes(){
+  const sec = document.getElementById('feedback');
+  const list = DATA.testimonials || [];
+  sec.hidden = list.length === 0;
+  if (!list.length) return;
+  document.getElementById('quotes').innerHTML = list.map(q => {
+    const initials = (q.name || '?').split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
+    return `<figure class="quote">
+      <span class="quote-mark" aria-hidden="true">&ldquo;</span>
+      <blockquote class="quote-text">${L(q)}</blockquote>
+      <figcaption class="quote-who">
+        <span class="quote-av">${initials}</span>
+        <span>
+          <span class="quote-name">${q.name}</span>
+          <div class="quote-role">${lang==='es'?q.roleEs:q.roleEn}</div>
+        </span>
+      </figcaption>
+    </figure>`;
+  }).join('');
+}
+
+function renderSprint(){
+  const s = DATA.sprint;
+  document.getElementById('sprint').innerHTML = `
+    <div class="sprint-top">
+      <span class="live"></span>
+      <span class="sprint-status">${lang==='es'?s.statusEs:s.statusEn}</span>
+      <span class="sprint-id">${s.id}</span>
+    </div>
+    <div class="sprint-main">
+      <div class="sprint-goal-label">${lang==='es'?s.goalLabelEs:s.goalLabelEn}</div>
+      <p class="sprint-goal">${lang==='es'?s.goalEs:s.goalEn}</p>
+      <div class="sprint-facts">
+        ${s.facts.map(f => `<div class="fact">
+          <div class="fact-k">${lang==='es'?f.kEs:f.kEn}</div>
+          <div class="fact-v">${lang==='es'?f.vEs:f.vEn}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderKpis(){
+  document.getElementById('kpis').innerHTML = DATA.kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-value${k.text?' is-text':''}">${k.value}${k.unit?`<span class="unit">${k.unit}</span>`:''}</div>
+      <div class="kpi-label">${L(k)}</div>
+      <div class="kpi-note">${lang==='es'?k.noteEs:k.noteEn}</div>
+    </div>`).join('');
+}
+
+function renderFilters(){
+  const used = new Set(DATA.jobs.flatMap(j => j.tags));
+  const opts = [['all', t('review.all')],
+    ...Object.entries(DATA.tags).filter(([k]) => used.has(k)).map(([k,v]) => [k, L(v)])];
+  document.getElementById('filters').innerHTML =
+    `<span class="filters-label">${t('review.filterLabel')}</span>` +
+    opts.map(([k,label]) => `<button class="chip" data-filter="${k}" aria-pressed="${k===filter}">${label}</button>`).join('');
+}
+
+function cardHTML(job, idx){
+  const j = job[lang];
+  const phase = DATA.phases.find(p => p.id === job.phase);
+  const isOpen = openState.has(idx);
+  const dimmed = (filter !== 'all' && !job.tags.includes(filter)) ? ' dimmed' : '';
+  const metrics = job.metrics && job.metrics.length ? `
+    <div class="metrics">${job.metrics.map(m => `
+      <div class="metric"><div class="metric-value">${m.value}</div><div class="metric-label">${L(m)}</div></div>`).join('')}
+    </div>` : '';
+  return `
+  <article class="card${isOpen?' open':''}${dimmed}" style="--phase-color:${phase.color}" data-idx="${idx}">
+    <button class="card-btn" aria-expanded="${isOpen}" aria-controls="body-${idx}">
+      <div class="card-top">
+        <div>
+          <span class="card-org">${job.org}</span>
+          <h3 class="card-role">${j.role}</h3>
+          <div class="card-meta">
+            <span>${j.period}</span><span class="sep">·</span><span>${j.place}</span>
+            ${j.current?`<span class="sep">·</span><span style="color:var(--accent)">● ${j.current}</span>`:''}
+          </div>
+        </div>
+        <span class="card-toggle" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </div>
+      <div class="card-tags">${job.tags.map(tg => `<span class="tag">${L(DATA.tags[tg])}</span>`).join('')}</div>
+    </button>
+    <div class="card-body" id="body-${idx}">
+      <div class="card-body-inner"><div class="card-body-pad">
+        ${metrics}
+        <ul class="bullets">${job.bullets[lang].map(b => `<li>${b}</li>`).join('')}</ul>
+      </div></div>
+    </div>
+  </article>`;
+}
+
+function renderTimeline(){
+  document.getElementById('timeline').innerHTML = DATA.jobs.map((job, i) => {
+    const phase = DATA.phases.find(p => p.id === job.phase);
+    return `<div class="tl-item" style="--phase-color:${phase.color}"><span class="tl-node"></span>${cardHTML(job,i)}</div>`;
+  }).join('');
+}
+
+function renderBoard(){
+  document.getElementById('board').innerHTML = DATA.phases.map(p => {
+    const jobs = DATA.jobs.map((j,i) => ({j,i})).filter(x => x.j.phase === p.id).reverse();
+    const visible = jobs.filter(x => filter === 'all' || x.j.tags.includes(filter)).length;
+    return `<div class="col" style="--phase-color:${p.color}">
+      <div class="col-head">
+        <span class="col-swatch"></span>
+        <div><div class="col-title">${L(p)}</div><div class="col-years">${p.years}</div></div>
+        <span class="col-count">${jobs.length}</span>
+      </div>
+      <div class="col-cards">
+        ${jobs.map(x => cardHTML(x.j, x.i)).join('')}
+        ${visible === 0 ? `<div class="col-empty">${t('review.noItems')}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRetro(){
+  document.getElementById('retroBoard').innerHTML = DATA.retro.map((col, ci) => {
+    const h = L(col);
+    return `<div class="retro-col reveal" style="--rc:${col.color};--d:${ci*90}ms">
+      <div class="retro-head">
+        <span class="retro-icon">${ICONS[col.icon]}</span>
+        <div><div class="retro-title">${h.title}</div><div class="retro-sub">${col.notes.length} ${lang==='es'?'notas':'notes'}</div></div>
+      </div>
+      <div class="retro-notes">
+        ${col.notes.map(n => { const x = L(n);
+          return `<div class="note"><div class="note-lead">${x.lead}</div><div class="note-text">${x.text}</div></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDod(){
+  document.getElementById('dodList').innerHTML = DATA.dod.map(d => {
+    const x = L(d);
+    return `<div class="dod-item">
+      <span class="dod-check">${ICONS.check}</span>
+      <div class="dod-text"><b>${x.b}</b> ${x.t}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderDaily(){
+  document.getElementById('dailyBoard').innerHTML = DATA.daily.map(d => {
+    const x = L(d);
+    return `<div class="daily-item">
+      <div class="daily-q">${ICONS[d.icon]}${x.q}</div>
+      <div class="daily-a">${x.a}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderVerified(){
+  const box = document.getElementById('verified');
+  if (!DATA.verified || !DATA.verified.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const chk = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg>';
+  box.innerHTML = `
+    <div class="verified-head">
+      <span class="verified-title">${chk}${t('skills.verifiedTitle')}</span>
+      <span class="verified-note">${t('skills.verifiedNote').replace('{k}', DATA.verified.length).replace('{n}', DATA.verifiedTotal)}
+        <a href="${DATA.credly}" target="_blank" rel="noopener">Credly</a></span>
+    </div>
+    <div class="verified-list">
+      ${DATA.verified.map(s => `<span class="vskill">${chk}${s}</span>`).join('')}
+    </div>`;
+}
+
+function renderSkills(){
+  document.getElementById('skills').innerHTML = DATA.skills.map(g => `
+    <div class="skill-group">
+      <h3>${L(g)}</h3>
+      <div class="skill-list">${g.items.map(s => `<span class="skill">${L(s)}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function renderEdu(){
+  document.getElementById('edu').innerHTML = DATA.edu.map(e => {
+    const x = L(e);
+    return `<div class="edu">
+      <span class="edu-status ${e.status}">${lang==='es'?e.statusEs:e.statusEn}</span>
+      <h3>${x.t}</h3><p>${x.s}</p>
+    </div>`;
+  }).join('');
+}
+
+function renderCerts(){
+  const box = document.getElementById('certs');
+  if (!DATA.certs || !DATA.certs.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const seal = '<svg class="cert-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="m9 14.5-1.5 7L12 19l4.5 2.5-1.5-7"/></svg>';
+  box.innerHTML = `
+    <div class="certs-head">
+      <span class="certs-title">${t('edu.certsTitle')}</span>
+      <a class="certs-link" href="${DATA.credly}" target="_blank" rel="noopener">
+        ${t('edu.certsLink')}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+      </a>
+    </div>
+    <div class="certs-grid">
+      ${DATA.certs.map(c => `<div class="cert-item">${seal}
+        <div><div class="cert-n">${c.n}</div><div class="cert-o">${c.org} · ${c.y}</div></div>
+      </div>`).join('')}
+    </div>`;
+}
+
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+}
+
+function renderAll(){
+  applyStatic(); renderHeroBadges(); renderSprint(); renderKpis(); renderFilters();
+  renderTimeline(); renderBoard(); renderQuotes(); renderRetro(); renderDod();
+  renderVerified(); renderSkills(); renderEdu(); renderCerts(); renderDaily();
+  observeReveals();
+}
+
+/* ══════════════════════════════════════════════ INTERACCIONES ═══ */
+document.querySelectorAll('.lang-switch button').forEach(b => {
+  b.addEventListener('click', () => {
+    lang = b.dataset.lang;
+    document.querySelectorAll('.lang-switch button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.lang === lang)));
+    renderAll();
+  });
+});
+
+document.querySelectorAll('.view-switch button').forEach(b => {
+  b.addEventListener('click', () => {
+    const v = b.dataset.view;
+    document.documentElement.dataset.view = v;
+    document.querySelectorAll('.view-switch button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.view === v)));
+  });
+});
+
+document.getElementById('filters').addEventListener('click', e => {
+  const b = e.target.closest('[data-filter]'); if (!b) return;
+  filter = b.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.filter === filter)));
+  renderTimeline(); renderBoard();
+});
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.card-btn'); if (!btn) return;
+  const card = btn.closest('.card');
+  const idx = Number(card.dataset.idx);
+  const willOpen = !card.classList.contains('open');
+  willOpen ? openState.add(idx) : openState.delete(idx);
+  document.querySelectorAll(`.card[data-idx="${idx}"]`).forEach(c => {
+    c.classList.toggle('open', willOpen);
+    c.querySelector('.card-btn').setAttribute('aria-expanded', String(willOpen));
+  });
+});
+
+let io;
+function observeReveals(){
+  if (io) io.disconnect();
+  io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { threshold:.06, rootMargin:'0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
+}
+
+const header = document.getElementById('site-header');
+const bar = document.getElementById('progress');
+const navA = [...document.querySelectorAll('#navlinks a')];
+const secs = navA.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+function onScroll(){
+  const y = window.scrollY;
+  header.classList.toggle('scrolled', y > 12);
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+  let cur = -1;
+  secs.forEach((s, i) => { if (s.getBoundingClientRect().top <= 140) cur = i; });
+  navA.forEach((a, i) => a.classList.toggle('active', i === cur));
+}
+window.addEventListener('scroll', onScroll, { passive:true });
+
+document.getElementById('year').textContent = new Date().getFullYear();
+renderAll();
+onScroll();
+</script>
+</body>
+</html>

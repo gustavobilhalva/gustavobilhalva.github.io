@@ -214,12 +214,7 @@ section{padding:56px 0;position:relative;z-index:1}
 .sec-head .ceremony{color:var(--text-muted);font-size:13.6px;font-style:italic;max-width:64ch;margin-top:9px;padding-left:13px;border-left:2px solid var(--line-soft)}
 
 /* ══════════════════════════════════════════════════ CONTROLES ═══ */
-.controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--line-soft)}
-.filters{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
-.filters-label{font-size:12px;color:var(--text-muted);margin-right:3px}
-.chip{font-size:12.6px;padding:6px 13px;border-radius:20px;border:1px solid var(--line);color:var(--text-secondary);transition:.2s var(--ease);background:var(--surface-1)}
-.chip:hover{border-color:var(--text-muted);color:var(--text-primary)}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#062018;font-weight:600}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--line-soft)}
 .view-switch{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
 .view-switch button{display:flex;align-items:center;gap:7px;font-size:12.8px;font-weight:500;padding:6.5px 14px;border-radius:7px;color:var(--text-muted);transition:.22s var(--ease)}
 .view-switch button svg{width:14px;height:14px}
@@ -380,7 +375,19 @@ html[data-view="board"] #view-board{display:block}
   background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);
   padding:13px 15px;display:flex;align-items:flex-start;gap:11px;transition:border-color .2s var(--ease);
 }
-.cert-item:hover{border-color:var(--accent-dim)}
+.cert-item:hover{border-color:var(--accent-dim);transform:translateY(-1px)}
+.cert-item .cert-n{transition:color .2s var(--ease)}
+.cert-item:hover .cert-n{color:var(--accent)}
+.cert-out{
+  width:12px;height:12px;flex-shrink:0;margin-left:auto;margin-top:2px;
+  color:var(--text-muted);opacity:0;transition:opacity .2s var(--ease),color .2s var(--ease);
+}
+.cert-item:hover .cert-out,.edu.is-link:hover .cert-out{opacity:1;color:var(--accent)}
+.edu.is-link{display:block;position:relative}
+.edu.is-link:hover{border-color:var(--accent-dim)}
+.edu.is-link h3{transition:color .2s var(--ease)}
+.edu.is-link:hover h3{color:var(--accent)}
+.edu.is-link .cert-out{position:absolute;top:22px;right:22px;margin:0;width:13px;height:13px}
 .cert-ico{width:16px;height:16px;flex-shrink:0;margin-top:2px;color:var(--accent-dim)}
 .cert-n{font-size:13.2px;font-weight:500;color:var(--text-primary);line-height:1.35}
 .cert-o{font-size:11.6px;color:var(--text-muted);margin-top:3px}
@@ -541,7 +548,6 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
     </div>
 
     <div class="controls reveal">
-      <div class="filters" id="filters"></div>
       <div class="view-switch" role="group" aria-label="Vista">
         <button data-view="timeline" aria-pressed="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/></svg>
@@ -688,13 +694,25 @@ const DATA = {
   /* ─── Certificaciones (Credly) ──────────────────────────────────
      Perfil completo: credly.com/users/gustavo-bilhalva            */
   credly: "https://www.credly.com/users/gustavo-bilhalva",
+
+  /* Cada tarjeta linkea a tu perfil de Credly. Si querés que alguna
+     apunte directo a su insignia, agregale un campo "url":
+
+       { n:"AWS Certified Cloud Practitioner", org:"Amazon Web Services",
+         y:"2027", url:"https://www.credly.com/badges/xxxx" },
+
+     Para obtener esa URL: entrá a la insignia en Credly, botón Share,
+     y copiá el link público que te muestra ahí.                     */
   certs: [
+    { n:"IBM Agile Achiever · Advanced",           org:"IBM Agile Academy", y:"2021",
+      url:"https://www.credly.com/badges/2427f6a0-f9c3-4dad-af07-8057990c388e/public_url" },
+    { n:"AWS Certified Cloud Practitioner",        org:"Amazon Web Services", y:"2027",
+      url:"https://www.credly.com/badges/744201ed-449a-42b8-9e0c-b6be305587ec/public_url" },
+    { n:"Enterprise Design Thinking Practitioner", org:"IBM", y:"2022",
+      url:"https://www.credly.com/badges/324e3ef5-25a8-4c4f-9fba-4da0e1f2efda/public_url" },
     { n:"IBM Explorer Project Manager",            org:"IBM", y:"2023" },
-    { n:"IBM Agile Achiever · Advanced",           org:"IBM Agile Academy", y:"2021" },
-    { n:"Enterprise Design Thinking Practitioner", org:"IBM", y:"2022" },
     { n:"IBM Garage Essentials",                   org:"IBM", y:"2022" },
     { n:"IBM Consulting · Building Teams",         org:"IBM Consulting Profession", y:"2021" },
-    { n:"AWS Certified Cloud Practitioner",        org:"Amazon Web Services", y:"2027" },
     { n:"Architectural Thinking",                  org:"IBM", y:"2022" },
     { n:"IBM watsonx Essentials",                  org:"IBM", y:"2024" },
     { n:"IBM watsonx.ai Technical Essentials",     org:"IBM", y:"2024" }
@@ -1018,6 +1036,7 @@ const DATA = {
   /* ─── FORMACIÓN (Refinement) ────────────────────────────────────── */
   edu: [
     { status:"cert", statusEs:"Certificación", statusEn:"Certification",
+      url:"https://www.credly.com/badges/5a9f0594-d0cf-4303-977c-a6d1d9ad4c9a/public_url",
       es:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org" },
       en:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org" } },
     { status:"done", statusEs:"Finalizado", statusEn:"Completed",
@@ -1034,7 +1053,7 @@ const I18N = {
   es:{
     "nav.review":"Sprint Review","nav.retro":"Retrospective","nav.dod":"Definition of Done",
     "nav.skills":"Sprint Backlog","nav.refinement":"Refinement","nav.contact":"Daily",
-    "hero.location":"Avellaneda · Buenos Aires · Argentina",
+    "hero.location":"GBA · Buenos Aires · Argentina",
     "hero.role":"Agile Project Manager & Scrum Master · PSM II",
     "hero.tagline":"De construir software a liderar a quienes lo construyen.",
     "hero.summary":"Lidero equipos ágiles y gestiono proyectos tecnológicos articulando las necesidades del negocio con la ejecución real de los equipos. Especialista en Scrum y Kanban, con foco en facilitación, gestión de dependencias, seguimiento de métricas y mejora continua. Ocho años como developer me dieron algo que no se aprende en un curso: entender los contextos complejos desde adentro y acompañar a los equipos con criterio técnico propio.",
@@ -1078,13 +1097,13 @@ const I18N = {
     "contact.title":"¿Armamos el próximo sprint?",
     "contact.intro":"Estoy abierto a conversar sobre roles de Agile Project Manager, Scrum Master o consultoría ágil. Escribime y coordinamos una charla.",
     "contact.linkedin":"Ver perfil de LinkedIn",
-    "contact.place":"Avellaneda, Buenos Aires, Argentina",
+    "contact.place":"GBA, Buenos Aires, Argentina",
     "footer.note":"Hecho a mano · Actualizado en 2026"
   },
   en:{
     "nav.review":"Sprint Review","nav.retro":"Retrospective","nav.dod":"Definition of Done",
     "nav.skills":"Sprint Backlog","nav.refinement":"Refinement","nav.contact":"Daily",
-    "hero.location":"Avellaneda · Buenos Aires · Argentina",
+    "hero.location":"Greater Buenos Aires · Argentina",
     "hero.role":"Agile Project Manager & Scrum Master · PSM II",
     "hero.tagline":"From building software to leading the people who build it.",
     "hero.summary":"I lead agile teams and manage technology projects, connecting business needs with how teams actually deliver. Specialist in Scrum and Kanban, focused on facilitation, dependency management, metrics tracking and continuous improvement. Eight years as a developer gave me something no course teaches: understanding complex contexts from the inside and guiding teams with real technical judgement.",
@@ -1128,7 +1147,7 @@ const I18N = {
     "contact.title":"Shall we plan the next sprint?",
     "contact.intro":"I'm open to conversations about Agile Project Manager, Scrum Master or agile consulting roles. Drop me a line and let's talk.",
     "contact.linkedin":"View LinkedIn profile",
-    "contact.place":"Avellaneda, Buenos Aires, Argentina",
+    "contact.place":"Greater Buenos Aires, Argentina",
     "footer.note":"Handcrafted · Updated 2026"
   }
 };
@@ -1213,15 +1232,6 @@ function renderKpis(){
       <div class="kpi-label">${L(k)}</div>
       <div class="kpi-note">${lang==='es'?k.noteEs:k.noteEn}</div>
     </div>`).join('');
-}
-
-function renderFilters(){
-  const used = new Set(DATA.jobs.flatMap(j => j.tags));
-  const opts = [['all', t('review.all')],
-    ...Object.entries(DATA.tags).filter(([k]) => used.has(k)).map(([k,v]) => [k, L(v)])];
-  document.getElementById('filters').innerHTML =
-    `<span class="filters-label">${t('review.filterLabel')}</span>` +
-    opts.map(([k,label]) => `<button class="chip" data-filter="${k}" aria-pressed="${k===filter}">${label}</button>`).join('');
 }
 
 function cardHTML(job, idx){
@@ -1346,13 +1356,19 @@ function renderSkills(){
     </div>`).join('');
 }
 
+// Link a la insignia; si no se cargó una URL propia, cae al perfil de Credly.
+const badgeUrl = url => url || DATA.credly;
+
 function renderEdu(){
   document.getElementById('edu').innerHTML = DATA.edu.map(e => {
     const x = L(e);
-    return `<div class="edu">
-      <span class="edu-status ${e.status}">${lang==='es'?e.statusEs:e.statusEn}</span>
-      <h3>${x.t}</h3><p>${x.s}</p>
-    </div>`;
+    const inner = `<span class="edu-status ${e.status}">${lang==='es'?e.statusEs:e.statusEn}</span>
+      <h3>${x.t}</h3><p>${x.s}</p>`;
+    return e.url
+      ? `<a class="edu is-link" href="${badgeUrl(e.url)}" target="_blank" rel="noopener">${inner}
+           <svg class="cert-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+         </a>`
+      : `<div class="edu">${inner}</div>`;
   }).join('');
 }
 
@@ -1370,9 +1386,10 @@ function renderCerts(){
       </a>
     </div>
     <div class="certs-grid">
-      ${DATA.certs.map(c => `<div class="cert-item">${seal}
+      ${DATA.certs.map(c => `<a class="cert-item" href="${badgeUrl(c.url)}" target="_blank" rel="noopener">${seal}
         <div><div class="cert-n">${c.n}</div><div class="cert-o">${c.org} · ${c.y}</div></div>
-      </div>`).join('')}
+        <svg class="cert-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+      </a>`).join('')}
     </div>`;
 }
 
@@ -1382,7 +1399,7 @@ function applyStatic(){
 }
 
 function renderAll(){
-  applyStatic(); renderHeroBadges(); renderSprint(); renderKpis(); renderFilters();
+  applyStatic(); renderHeroBadges(); renderSprint(); renderKpis();
   renderTimeline(); renderBoard(); renderQuotes(); renderRetro(); renderDod();
   renderVerified(); renderSkills(); renderEdu(); renderCerts(); renderDaily();
   observeReveals();
@@ -1403,13 +1420,6 @@ document.querySelectorAll('.view-switch button').forEach(b => {
     document.documentElement.dataset.view = v;
     document.querySelectorAll('.view-switch button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.view === v)));
   });
-});
-
-document.getElementById('filters').addEventListener('click', e => {
-  const b = e.target.closest('[data-filter]'); if (!b) return;
-  filter = b.dataset.filter;
-  document.querySelectorAll('[data-filter]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.filter === filter)));
-  renderTimeline(); renderBoard();
 });
 
 document.addEventListener('click', e => {

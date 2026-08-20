@@ -733,7 +733,7 @@ const DATA = {
        ]
 
      Pedilas por LinkedIn: dos o tres líneas de un PO, un dev de tu
-     equipo en IBM o un cliente de Zarego alcanzan.
+     equipo en IBM o un cliente actual alcanzan.
      ═══════════════════════════════════════════════════════════════ */
   testimonials: [],
 
@@ -748,7 +748,7 @@ const DATA = {
     facts: [
       { kEs:"Inicio",     kEn:"Started",   vEs:"Julio 2011",            vEn:"July 2011" },
       { kEs:"Duración",   kEn:"Duration",  vEs:"15 años · en curso",    vEn:"15 years · ongoing" },
-      { kEs:"Increments", kEn:"Increments",vEs:"4 organizaciones",      vEn:"4 organisations" },
+      { kEs:"Increments", kEn:"Increments",vEs:"4 etapas",             vEn:"4 stages" },
       { kEs:"Rol actual", kEn:"Current role", vEs:"Agile PM & Scrum Consultant", vEn:"Agile PM & Scrum Consultant" }
     ]
   },
@@ -783,9 +783,9 @@ const DATA = {
   /* ─── EXPERIENCIA (Sprint Review) ───────────────────────────────── */
   jobs: [
     {
-      org:"Zarego", phase:"agil",
-      es:{ role:"Agile Project Manager & Scrum Consultant", period:"Ene 2026 – Actualidad", place:"Argentina", current:"Actual" },
-      en:{ role:"Agile Project Manager & Scrum Consultant", period:"Jan 2026 – Present",    place:"Argentina", current:"Current" },
+      org:{ es:"Consultoría independiente", en:"Independent consulting" }, phase:"agil",
+      es:{ role:"Agile Project Manager & Scrum Consultant", period:"Ene 2026 – Actualidad", place:"Remoto · equipos internacionales", current:"Actual" },
+      en:{ role:"Agile Project Manager & Scrum Consultant", period:"Jan 2026 – Present",    place:"Remote · international teams",     current:"Current" },
       tags:["scrum","liderazgo","stakeholders"],
       metrics:[],
       bullets:{
@@ -794,7 +794,7 @@ const DATA = {
           "Identificación y remoción de impedimentos tanto a nivel equipo como organizacional.",
           "Optimización del flujo de trabajo y mejora de la previsibilidad en la entrega.",
           "Facilitación de eventos ágiles (Planning, Daily, Review, Retrospective) con foco en resultados concretos.",
-          "Alineación entre equipos técnicos y stakeholders para acelerar la toma de decisiones.",
+          "Alineación entre equipos técnicos y stakeholders de distintas zonas horarias para acelerar la toma de decisiones.",
           "Coaching a equipos para fortalecer su autonomía, su foco y su capacidad de mejora continua."
         ],
         en:[
@@ -802,7 +802,7 @@ const DATA = {
           "Identification and removal of impediments at both team and organisational level.",
           "Workflow optimisation and improved delivery predictability.",
           "Facilitation of agile events (Planning, Daily, Review, Retrospective) focused on concrete outcomes.",
-          "Alignment between engineering teams and stakeholders to speed up decision-making.",
+          "Alignment between engineering teams and stakeholders across time zones to speed up decision-making.",
           "Coaching teams to strengthen autonomy, focus and continuous improvement."
         ]
       }
@@ -968,8 +968,8 @@ const DATA = {
       es:{ q:"¿Qué hice?", a:"Cinco años en <b>IBM</b> liderando un equipo y supervisando otros tres, con contratos y SLA exigentes. Antes, ocho años construyendo software en <b>Telecom</b> y <b>VISMA</b>." },
       en:{ q:"What did I do?", a:"Five years at <b>IBM</b> leading one team and overseeing three more, under demanding contracts and SLAs. Before that, eight years building software at <b>Telecom</b> and <b>VISMA</b>." } },
     { icon:"play",
-      es:{ q:"¿Qué estoy haciendo?", a:"<b>Agile Project Manager & Scrum Consultant en Zarego</b>, implementando prácticas ágiles en contextos reales de negocio. En paralelo, cursando la <b>Licenciatura en Ciencias de Datos</b>." },
-      en:{ q:"What am I doing?", a:"<b>Agile Project Manager & Scrum Consultant at Zarego</b>, implementing agile practices in real business contexts. In parallel, studying for a <b>BSc in Data Science</b>." } },
+      es:{ q:"¿Qué estoy haciendo?", a:"<b>Consultoría ágil independiente para equipos internacionales</b>, implementando prácticas ágiles en contextos reales de negocio. En paralelo, cursando la <b>Licenciatura en Ciencias de Datos</b>." },
+      en:{ q:"What am I doing?", a:"<b>Independent agile consulting for international teams</b>, implementing agile practices in real business contexts. In parallel, studying for a <b>BSc in Data Science</b>." } },
     { icon:"block",
       es:{ q:"¿Qué me bloquea?", a:"Nada por ahora. Estoy <b>abierto a escuchar propuestas</b> de Agile Project Manager, Scrum Master o consultoría ágil. Si tenés un equipo que necesita destrabarse, escribime." },
       en:{ q:"Any blockers?", a:"None right now. I'm <b>open to hearing about opportunities</b> in Agile Project Management, Scrum Mastery or agile consulting. If you have a team that needs unblocking, get in touch." } }
@@ -1238,7 +1238,7 @@ function cardHTML(job, idx){
     <button class="card-btn" aria-expanded="${isOpen}" aria-controls="body-${idx}">
       <div class="card-top">
         <div>
-          <span class="card-org">${job.org}</span>
+          <span class="card-org">${typeof job.org === 'string' ? job.org : L(job.org)}</span>
           <h3 class="card-role">${j.role}</h3>
           <div class="card-meta">
             <span>${j.period}</span><span class="sep">·</span><span>${j.place}</span>

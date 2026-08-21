@@ -37,6 +37,11 @@
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Gustavo Bilhalva · Agile Project Manager & Scrum Master">
 <meta property="og:description" content="De construir software a liderar a quienes lo construyen. Un portfolio estructurado como un sprint: Review, Retrospectiva y Definition of Done.">
+<!-- Inter: el CSS ya la pedía pero nunca se cargaba, así que caía a la fuente del sistema -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2312171f'/><text x='50' y='68' font-size='52' font-family='system-ui,sans-serif' font-weight='600' fill='%234fd6a5' text-anchor='middle'>GB</text></svg>">
 
 <style>
@@ -81,12 +86,56 @@ body{
   margin:0;font-family:var(--font);background:var(--surface-0);color:var(--text-primary);
   line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(760px 420px at 12% -6%, rgba(79,214,165,.10), transparent 62%),
-    radial-gradient(680px 400px at 92% 4%, rgba(57,135,229,.09), transparent 62%);
+/* ══════════════════════════════════════════════════ FONDO VIVO ═══
+   Tres masas de color grandes y difusas que derivan a distinta
+   velocidad. Nunca coinciden, así que el patrón no se repite.     */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+/* Elipses, no círculos: al rotar, la silueta cambia y las nubes parecen
+   deformarse. Donde dos se superponen nacen y mueren formas nuevas. */
+.bg i{position:absolute;display:block;border-radius:50%;will-change:transform,opacity}
+.bg i:nth-child(1){
+  top:-38vh;left:-26vw;width:128vw;height:82vh;
+  background:radial-gradient(closest-side,rgba(79,214,165,.22),rgba(79,214,165,.08) 52%,transparent 76%);
+  animation:cloud-a 38s ease-in-out infinite alternate,
+            breathe-a 23s ease-in-out infinite alternate;
 }
+.bg i:nth-child(2){
+  top:-30vh;right:-30vw;width:120vw;height:76vh;
+  background:radial-gradient(closest-side,rgba(57,135,229,.21),rgba(57,135,229,.07) 52%,transparent 76%);
+  animation:cloud-b 53s ease-in-out infinite alternate,
+            breathe-b 31s ease-in-out infinite alternate;
+}
+.bg i:nth-child(3){
+  top:2vh;left:18vw;width:112vw;height:70vh;
+  background:radial-gradient(closest-side,rgba(124,92,255,.18),rgba(124,92,255,.06) 52%,transparent 76%);
+  animation:cloud-c 67s ease-in-out infinite alternate,
+            breathe-a 27s ease-in-out infinite alternate;
+}
+.bg i:nth-child(4){
+  bottom:-34vh;left:-20vw;width:118vw;height:74vh;
+  background:radial-gradient(closest-side,rgba(45,196,190,.16),rgba(45,196,190,.05) 52%,transparent 76%);
+  animation:cloud-d 44s ease-in-out infinite alternate,
+            breathe-b 19s ease-in-out infinite alternate;
+}
+@keyframes cloud-a{
+  0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(1)}
+  100%{transform:translate3d(14vw,10vh,0)  rotate(38deg)  scale(1.2)}
+}
+@keyframes cloud-b{
+  0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(1.12)}
+  100%{transform:translate3d(-13vw,14vh,0) rotate(-44deg) scale(.88)}
+}
+@keyframes cloud-c{
+  0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(.9)}
+  100%{transform:translate3d(-18vw,-12vh,0) rotate(52deg) scale(1.24)}
+}
+@keyframes cloud-d{
+  0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(1.05)}
+  100%{transform:translate3d(16vw,-11vh,0) rotate(-33deg) scale(.92)}
+}
+/* La opacidad late en otro período, así las nubes se forman y se disuelven */
+@keyframes breathe-a{0%{opacity:.55} 100%{opacity:1}}
+@keyframes breathe-b{0%{opacity:1}   100%{opacity:.5}}
 h1,h2,h3,h4{margin:0;line-height:1.18;font-weight:600;letter-spacing:-.021em}
 p{margin:0}
 ul{margin:0;padding:0;list-style:none}
@@ -140,7 +189,37 @@ header.scrolled{border-bottom-color:var(--line-soft);background:rgba(12,16,21,.9
 .avail .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);position:relative;flex-shrink:0}
 .avail .dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--accent);opacity:.45;animation:pulse 2.4s var(--ease) infinite}
 .hero h1{font-size:clamp(2.3rem,5.4vw,3.55rem);letter-spacing:-.035em;margin-bottom:14px}
-.hero h1 .light{color:var(--text-secondary);font-weight:300}
+.hero h1 .light{font-weight:300}
+
+/* ── Foco que barre el título de derecha a izquierda ──
+   La luz se recorta contra los glifos (background-clip:text), así
+   ilumina las letras y no el rectángulo del fondo. Cada mitad del
+   nombre conserva su color base dentro del degradado.            */
+.hero h1 .n1,.hero h1 .light{
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  background-repeat:no-repeat;background-size:300% 100%;
+  animation:title-sweep 6.4s linear infinite;   /* 20% más rápido */
+}
+/* Las bases van un escalón por debajo del blanco puro: si el texto ya
+   estuviera al máximo, el foco no tendría a dónde iluminar. */
+.hero h1 .n1{
+  background-image:linear-gradient(100deg,
+    #c3cfdd 42%, #ffffff 50%, #c3cfdd 58%);   /* haz más angosto = se lee como foco */
+  animation-delay:1.2s;
+}
+.hero h1 .light{
+  background-image:linear-gradient(100deg,
+    #7c8a9b 42%, #eaf2fa 50%, #7c8a9b 58%);
+  animation-delay:1.08s;          /* llega apenas antes: la luz cruza sin cortarse */
+}
+/* background-position DEBE quedar entre 0% y 100%: fuera de ese rango el
+   degradado sale del elemento y, como el texto es transparente, el nombre
+   se vuelve invisible. Dentro del rango siempre hay color base pintado. */
+@keyframes title-sweep{
+  0%       {background-position:0% 0}     /* la luz todavía no entró (derecha) */
+  32%,100% {background-position:100% 0}   /* la luz ya salió (izquierda) */
+}
 .hero-role{font-size:clamp(1.02rem,2vw,1.16rem);font-weight:500;color:var(--accent);margin-bottom:22px}
 .hero-tagline{
   font-size:clamp(1.16rem,2.6vw,1.42rem);font-weight:300;color:var(--text-primary);
@@ -380,14 +459,6 @@ html[data-view="board"] #view-board{display:block}
 }
 .vskill svg{width:13px;height:13px;color:var(--accent);flex-shrink:0}
 
-/* ════════════════════════════════════════════════════ SKILLS ═══ */
-.skill-groups{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.skill-group{background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:22px}
-.skill-group h3{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:15px;font-weight:600}
-.skill-list{display:flex;flex-wrap:wrap;gap:7px}
-.skill{font-size:13px;padding:6px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--text-secondary);transition:.2s var(--ease)}
-.skill:hover{border-color:var(--accent-dim);color:var(--text-primary);transform:translateY(-1px)}
-
 /* ═════════════════════════════════════════════════ EDUCATION ═══ */
 .edu-list{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .edu{background:var(--surface-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:22px}
@@ -411,6 +482,9 @@ html[data-view="board"] #view-board{display:block}
   padding:13px 15px;display:flex;align-items:flex-start;gap:11px;transition:border-color .2s var(--ease);
 }
 .cert-item:hover{border-color:var(--accent-dim);transform:translateY(-1px)}
+.cert-item.is-static{cursor:default}
+.cert-item.is-static:hover{border-color:var(--line-soft);transform:none}
+.verified{margin-top:16px}
 .cert-item .cert-n{transition:color .2s var(--ease)}
 .cert-item:hover .cert-n{color:var(--accent)}
 .cert-out{
@@ -456,6 +530,12 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   .reveal{opacity:1;transform:none}
   .note{--rot:0deg}
   .note:hover{transform:none}
+  .bg i{animation:none}
+  /* Sin foco: el título vuelve a color sólido, no a medio degradado */
+  .hero h1 .n1,.hero h1 .light{
+    background-image:none;-webkit-text-fill-color:currentColor;color:var(--text-primary);
+  }
+  .hero h1 .light{color:var(--text-secondary)}
 }
 
 /* ══════════════════════════════════════════════════ RESPONSIVE ═══ */
@@ -491,7 +571,6 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   .hero-tagline{max-width:none}
   .card-meta{flex-direction:column;align-items:flex-start;gap:2px}
   .card-meta .sep{display:none}
-  .skill-groups{grid-template-columns:1fr}
   .controls{flex-direction:column;align-items:stretch}
   .view-switch{width:100%}
   .view-switch button{flex:1;justify-content:center}
@@ -512,7 +591,7 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   html[data-view] #view-board{display:none!important}
   html[data-view] #view-timeline{display:block!important}
   .card-body{grid-template-rows:1fr!important}
-  .card,.kpi,.skill-group,.edu,.contact-box,.note,.dod,.daily-item,.sprint,.quote,.certs,.cert-item,.verified,.vskill{border:1px solid #ccc;background:#fff}
+  .card,.kpi,.edu,.contact-box,.note,.dod,.daily-item,.sprint,.quote,.certs,.cert-item,.verified,.vskill{border:1px solid #ccc;background:#fff}
   .hero{padding:0}
   section{padding:18px 0;break-inside:avoid}
   .card,.note,.retro-col{break-inside:avoid}
@@ -524,6 +603,7 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
 
 <body>
 <div id="progress"></div>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
 <!-- ══════════════════════════════════════════════════════ NAV ═══ -->
 <header id="site-header">
@@ -536,7 +616,6 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
       <a href="#review" data-i18n="nav.review"></a>
       <a href="#retro" data-i18n="nav.retro"></a>
       <a href="#dod" data-i18n="nav.dod"></a>
-      <a href="#backlog" data-i18n="nav.skills"></a>
       <a href="#refinement" data-i18n="nav.refinement"></a>
       <a href="#daily" data-i18n="nav.contact"></a>
     </nav>
@@ -557,7 +636,7 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
     <div class="hero-grid">
       <div>
         <div class="hero-badges" id="heroBadges"></div>
-        <h1>Gustavo Andrés <span class="light">Bilhalva</span></h1>
+        <h1><span class="n1">Gustavo Andrés</span> <span class="light">Bilhalva</span></h1>
         <p class="hero-role" data-i18n="hero.role"></p>
         <p class="hero-tagline" data-i18n="hero.tagline"></p>
         <p class="hero-summary" data-i18n="hero.summary"></p>
@@ -657,19 +736,6 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════ SPRINT BACKLOG ═══ -->
-<section id="backlog">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="sec-kicker">Sprint Backlog</span>
-      <h2 data-i18n="skills.title"></h2>
-      <p data-i18n="skills.intro"></p>
-    </div>
-    <div class="verified reveal" id="verified"></div>
-    <div class="skill-groups reveal" id="skills"></div>
-  </div>
-</section>
-
 <!-- ═════════════════════════════════════════════════════ REFINEMENT ═══ -->
 <section id="refinement">
   <div class="wrap">
@@ -680,6 +746,8 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
     </div>
     <div class="edu-list reveal" id="edu"></div>
     <div class="certs reveal" id="certs"></div>
+    <div class="verified reveal" id="verified"></div>
+    <div class="certs reveal" id="langs"></div>
   </div>
 </section>
 
@@ -1046,49 +1114,10 @@ const DATA = {
       en:{ q:"Any blockers?", a:"None right now. I'm <b>open to hearing about opportunities</b> in Agile Project Management, Scrum Mastery or agile consulting. If you have a team that needs unblocking, get in touch." } }
   ],
 
-  /* ─── COMPETENCIAS (Sprint Backlog) ─────────────────────────────── */
-  skills: [
-    { es:"Agilidad y entrega", en:"Agility & delivery", items:[
-      { es:"Scrum", en:"Scrum" },
-      { es:"Kanban", en:"Kanban" },
-      { es:"Facilitación", en:"Facilitation" },
-      { es:"Gestión de backlog", en:"Backlog management" },
-      { es:"Estimación con story points", en:"Story-point estimation" },
-      { es:"Gestión de dependencias", en:"Dependency management" },
-      { es:"Mejora continua", en:"Continuous improvement" }
-    ]},
-    { es:"Gestión de proyectos", en:"Project management", items:[
-      { es:"Project Management", en:"Project management" },
-      { es:"OKRs", en:"OKRs" },
-      { es:"SLA y contratos", en:"SLAs & contracts" },
-      { es:"Lead time y cycle time", en:"Lead time & cycle time" },
-      { es:"Velocity y burndown", en:"Velocity & burndown" },
-      { es:"Previsibilidad de entrega", en:"Delivery predictability" },
-      { es:"Design Thinking", en:"Design Thinking" },
-      { es:"Alineación con PMO", en:"PMO alignment" }
-    ]},
-    { es:"Liderazgo y personas", en:"Leadership & people", items:[
-      { es:"Coaching de equipos", en:"Team coaching" },
-      { es:"Liderazgo técnico", en:"Technical leadership" },
-      { es:"Gestión de stakeholders", en:"Stakeholder management" },
-      { es:"Entrevistas y selección", en:"Interviewing & hiring" },
-      { es:"Autonomía de equipos", en:"Team autonomy" }
-    ]},
-    { es:"Idiomas", en:"Languages", items:[
-      { es:"Español · Nativo",                      en:"Spanish · Native" },
-      { es:"Inglés · Competencia profesional",      en:"English · Professional working proficiency" },
-      { es:"Experiencia laboral en inglés",         en:"Professional experience working in English" }
-    ]},
-    { es:"Base técnica", en:"Engineering background", items:[
-      { es:"Smalltalk", en:"Smalltalk" },
-      { es:"Java", en:"Java" },
-      { es:".NET", en:".NET" },
-      { es:"GemStone (NoSQL/OO)", en:"GemStone (NoSQL/OO)" },
-      { es:"Diseño orientado a objetos", en:"Object-oriented design" },
-      { es:"UML", en:"UML" },
-      { es:"Shell scripting (Unix)", en:"Shell scripting (Unix)" },
-      { es:"VisualAge / VisualWorks", en:"VisualAge / VisualWorks" }
-    ]}
+  /* ─── Idiomas ──────────────────────────────────────────────────── */
+  langs: [
+    { es:"Español · Nativo",                              en:"Spanish · Native" },
+    { es:"Inglés · Competencia profesional de trabajo",   en:"English · Professional working proficiency" }
   ],
 
   /* ─── FORMACIÓN (Refinement) ────────────────────────────────────── */
@@ -1148,6 +1177,7 @@ const I18N = {
     "edu.intro":"Mi backlog personal de formación: nunca dejó de refinarse.",
     "edu.certsTitle":"Otras certificaciones",
     "edu.certsLink":"Ver todas verificadas en Credly",
+    "edu.langsTitle":"Idiomas",
 
     "daily.title":"En qué estoy hoy",
     "daily.intro":"Las tres preguntas de cualquier daily, aplicadas a mi propia carrera.",
@@ -1198,6 +1228,7 @@ const I18N = {
     "edu.intro":"My personal learning backlog — it never stopped being refined.",
     "edu.certsTitle":"Other certifications",
     "edu.certsLink":"See all verified on Credly",
+    "edu.langsTitle":"Languages",
 
     "daily.title":"Where I am today",
     "daily.intro":"The three questions of any daily, applied to my own career.",
@@ -1408,16 +1439,22 @@ function renderVerified(){
     </div>`;
 }
 
-function renderSkills(){
-  document.getElementById('skills').innerHTML = DATA.skills.map(g => `
-    <div class="skill-group">
-      <h3>${L(g)}</h3>
-      <div class="skill-list">${g.items.map(s => `<span class="skill">${L(s)}</span>`).join('')}</div>
-    </div>`).join('');
-}
-
-// Link a la insignia; si no se cargó una URL propia, cae al perfil de Credly.
+// Link a la insignia en Credly; si no se cargó una URL propia, cae al perfil.
 const badgeUrl = url => url || DATA.credly;
+
+function renderLangs(){
+  const box = document.getElementById('langs');
+  if (!DATA.langs || !DATA.langs.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const globe = '<svg class="cert-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>';
+  box.innerHTML = `
+    <div class="certs-head"><span class="certs-title">${t('edu.langsTitle')}</span></div>
+    <div class="certs-grid">
+      ${DATA.langs.map(l => `<div class="cert-item is-static">${globe}
+        <div><div class="cert-n">${L(l)}</div></div>
+      </div>`).join('')}
+    </div>`;
+}
 
 function renderEdu(){
   document.getElementById('edu').innerHTML = DATA.edu.map(e => {
@@ -1461,7 +1498,7 @@ function applyStatic(){
 function renderAll(){
   applyStatic(); renderHeroBadges(); renderSprint(); renderKpis();
   renderTimeline(); renderBoard(); renderQuotes(); renderRetro(); renderDod();
-  renderVerified(); renderSkills(); renderEdu(); renderCerts(); renderDaily();
+  renderEdu(); renderCerts(); renderVerified(); renderLangs(); renderDaily();
   observeReveals();
 }
 

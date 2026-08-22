@@ -74,6 +74,14 @@
   --radius:14px;
   --radius-sm:9px;
   --maxw:1120px;
+  /* Rail de navegación de la izquierda (LineSidebar) */
+  --rail-w:250px;      /* franja que el rail se reserva para él solo */
+  --rail-inset:28px;   /* separación de la primera marca respecto del borde */
+  --marker-len:34px;   /* largo de la raya que acompaña a cada sección */
+  --marker-gap:12px;   /* aire entre la raya y el número */
+  --rail-gap:22px;     /* separación vertical entre secciones */
+  --rail-shift:14px;   /* cuánto se corre el texto cuando el mouse se acerca */
+  --tick-scale:.5;     /* largo del tick intermedio, en partes de --marker-len */
   --ease:cubic-bezier(.22,.61,.36,1);
   --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
@@ -87,51 +95,63 @@ body{
   line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
 /* ══════════════════════════════════════════════════ FONDO VIVO ═══
-   Tres masas de color grandes y difusas que derivan a distinta
-   velocidad. Nunca coinciden, así que el patrón no se repite.     */
+   El fondo es una AURORA en WebGL (shader de reactbits.dev, reescrito
+   sin React ni la librería ogl para no romper el "archivo único").
+   El canvas ocupa toda la ventana y la aurora se pinta en el tercio
+   de arriba, que es donde el shader concentra la intensidad.
+
+   Debajo quedan las cuatro nubes CSS originales como PLAN B: si el
+   navegador no tiene WebGL2, el JS no enciende el canvas y se ven
+   ellas. No las borres pensando que son código muerto.              */
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg canvas{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  opacity:.55;   /* la aurora original es muy saturada para este fondo */
+}
+/* Con el canvas andando, las nubes se apagan: son excluyentes */
+.bg.gl i{display:none}
 /* Elipses, no círculos: al rotar, la silueta cambia y las nubes parecen
    deformarse. Donde dos se superponen nacen y mueren formas nuevas. */
 .bg i{position:absolute;display:block;border-radius:50%;will-change:transform,opacity}
 .bg i:nth-child(1){
   top:-38vh;left:-26vw;width:128vw;height:82vh;
   background:radial-gradient(closest-side,rgba(79,214,165,.22),rgba(79,214,165,.08) 52%,transparent 76%);
-  animation:cloud-a 38s ease-in-out infinite alternate,
-            breathe-a 23s ease-in-out infinite alternate;
+  animation:cloud-a 17s ease-in-out infinite alternate,
+            breathe-a 11s ease-in-out infinite alternate;
 }
 .bg i:nth-child(2){
   top:-30vh;right:-30vw;width:120vw;height:76vh;
   background:radial-gradient(closest-side,rgba(57,135,229,.21),rgba(57,135,229,.07) 52%,transparent 76%);
-  animation:cloud-b 53s ease-in-out infinite alternate,
-            breathe-b 31s ease-in-out infinite alternate;
+  animation:cloud-b 23s ease-in-out infinite alternate,
+            breathe-b 15s ease-in-out infinite alternate;
 }
 .bg i:nth-child(3){
   top:2vh;left:18vw;width:112vw;height:70vh;
   background:radial-gradient(closest-side,rgba(124,92,255,.18),rgba(124,92,255,.06) 52%,transparent 76%);
-  animation:cloud-c 67s ease-in-out infinite alternate,
-            breathe-a 27s ease-in-out infinite alternate;
+  animation:cloud-c 29s ease-in-out infinite alternate,
+            breathe-a 13s ease-in-out infinite alternate;
 }
 .bg i:nth-child(4){
   bottom:-34vh;left:-20vw;width:118vw;height:74vh;
   background:radial-gradient(closest-side,rgba(45,196,190,.16),rgba(45,196,190,.05) 52%,transparent 76%);
-  animation:cloud-d 44s ease-in-out infinite alternate,
-            breathe-b 19s ease-in-out infinite alternate;
+  animation:cloud-d 19s ease-in-out infinite alternate,
+            breathe-b 9s ease-in-out infinite alternate;
 }
 @keyframes cloud-a{
   0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(1)}
-  100%{transform:translate3d(14vw,10vh,0)  rotate(38deg)  scale(1.2)}
+  100%{transform:translate3d(24vw,17vh,0)  rotate(58deg)  scale(1.28)}
 }
 @keyframes cloud-b{
   0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(1.12)}
-  100%{transform:translate3d(-13vw,14vh,0) rotate(-44deg) scale(.88)}
+  100%{transform:translate3d(-22vw,21vh,0) rotate(-66deg) scale(.82)}
 }
 @keyframes cloud-c{
   0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(.9)}
-  100%{transform:translate3d(-18vw,-12vh,0) rotate(52deg) scale(1.24)}
+  100%{transform:translate3d(-28vw,-19vh,0) rotate(74deg) scale(1.32)}
 }
 @keyframes cloud-d{
   0%  {transform:translate3d(0,0,0)        rotate(0deg)   scale(1.05)}
-  100%{transform:translate3d(16vw,-11vh,0) rotate(-33deg) scale(.92)}
+  100%{transform:translate3d(26vw,-18vh,0) rotate(-50deg) scale(.86)}
 }
 /* La opacidad late en otro período, así las nubes se forman y se disuelven */
 @keyframes breathe-a{0%{opacity:.55} 100%{opacity:1}}
@@ -175,6 +195,68 @@ header.scrolled{border-bottom-color:var(--line-soft);background:rgba(12,16,21,.9
 .lang-switch button{font-size:12px;font-weight:600;padding:4.5px 11px;border-radius:6.5px;color:var(--text-muted);transition:.2s var(--ease);letter-spacing:.03em}
 .lang-switch button[aria-pressed="true"]{background:var(--surface-3);color:var(--text-primary)}
 
+/* ═══════════════════════════════ RAIL DE NAVEGACIÓN (LineSidebar) ═══
+   Las cinco secciones como una escala vertical numerada, fija a la
+   izquierda: una raya por sección, un tick corto entre medio y el
+   texto que se enciende y se corre cuando el mouse se acerca.
+   Adaptación del LineSidebar de reactbits.dev a HTML plano.
+
+   Antes acá vivía el Option Wheel del mismo sitio. Se cambió: era un
+   SELECTOR, no un menú. Con las cinco opciones en arco, rotadas y
+   desenfocadas, se leía chico y decorativo. Este es un componente de
+   navegación de verdad y no sacrifica legibilidad.
+
+   El rail solo aparece cuando hay lugar (≥1180px). Por debajo, la
+   navegación vuelve a los links horizontales de la barra, como antes. */
+.rail{
+  position:fixed;left:0;top:0;bottom:0;width:var(--rail-w);z-index:95;
+  display:none;align-items:center;
+  outline:none;
+}
+.rail-list{
+  position:relative;width:100%;
+  padding-left:calc(var(--rail-inset) + var(--marker-len) + var(--marker-gap));
+  display:flex;flex-direction:column;gap:var(--rail-gap);
+}
+.rail-item{position:relative}
+.rail-link{display:block;position:relative}
+/* Zona de click más generosa que el texto: incluye la raya de la izquierda */
+.rail-link::before{content:'';position:absolute;inset:-7px -14px -7px -46px}
+.rail-text{
+  display:inline-flex;align-items:baseline;white-space:nowrap;
+  font-size:15.4px;line-height:1.2;letter-spacing:-.012em;
+  color:var(--text-muted);
+  color:color-mix(in srgb,var(--accent) calc(var(--effect,0) * 100%),var(--text-muted));
+  transform:translateX(calc(var(--effect,0) * var(--rail-shift)));
+  will-change:transform,color;
+}
+.rail-item.is-active .rail-text{font-weight:600}
+/* El número en monoespaciada: hace que las cinco entradas se lean como
+   una lista ordenada y no como cinco links sueltos. */
+.rail-index{
+  font-family:var(--mono);margin-right:.58rem;font-size:.8em;
+  opacity:calc(.5 + var(--effect,0) * .5);
+}
+.rail-marker{
+  position:absolute;top:50%;left:calc(-1 * (var(--marker-len) + var(--marker-gap)));
+  height:1px;width:var(--marker-len);
+  background:var(--line);
+  background:color-mix(in srgb,var(--accent) calc(var(--effect,0) * 100%),var(--line));
+  transform-origin:left center;
+  transform:translateY(-50%) scaleX(calc(.7 + var(--effect,0) * .5));
+}
+/* Tick corto entre sección y sección: es lo que hace que el conjunto se
+   lea como una regla graduada y no como una lista con viñetas. */
+.rail-item:not(:last-child)::after{
+  content:'';position:absolute;
+  top:calc(100% + var(--rail-gap) / 2);
+  left:calc(-1 * (var(--marker-len) + var(--marker-gap)));
+  height:1px;width:calc(var(--marker-len) * var(--tick-scale));
+  background:var(--line);opacity:.5;
+  transform-origin:left center;
+  transform:translateY(-50%) scaleX(calc(.7 + var(--effect,0) * .6));
+}
+
 /* ════════════════════════════════════════════════════════ HERO ═══ */
 .hero{padding:142px 0 46px}
 .hero-grid{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:start}
@@ -203,14 +285,16 @@ header.scrolled{border-bottom-color:var(--line-soft);background:rgba(12,16,21,.9
 }
 /* Las bases van un escalón por debajo del blanco puro: si el texto ya
    estuviera al máximo, el foco no tendría a dónde iluminar. */
+/* El salto entre base y punta del haz es lo que se percibe como brillo.
+   Como el blanco ya está al tope, el 15% extra sale de bajar la base. */
 .hero h1 .n1{
   background-image:linear-gradient(100deg,
-    #c3cfdd 42%, #ffffff 50%, #c3cfdd 58%);   /* haz más angosto = se lee como foco */
+    #bbc6d3 42%, #ffffff 50%, #bbc6d3 58%);   /* haz angosto = se lee como foco */
   animation-delay:1.2s;
 }
 .hero h1 .light{
   background-image:linear-gradient(100deg,
-    #7c8a9b 42%, #eaf2fa 50%, #7c8a9b 58%);
+    #74818f 42%, #f4f9fe 50%, #74818f 58%);
   animation-delay:1.08s;          /* llega apenas antes: la luz cruza sin cortarse */
 }
 /* background-position DEBE quedar entre 0% y 100%: fuera de ese rango el
@@ -539,6 +623,21 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
 }
 
 /* ══════════════════════════════════════════════════ RESPONSIVE ═══ */
+/* El rail necesita su propia franja: si se superpusiera al contenido
+   habría que elegir entre leer y navegar. Desde 1180px el cuerpo se
+   corre a la derecha y el rail ocupa lo que dejó libre. Por debajo el
+   rail no existe y manda la barra de arriba, igual que antes.
+
+   OJO con el header: va con left:0 y padding-left, NO con left:var(--rail-w).
+   Con left, la barra empezaba recién a los 250px y el vidrio esmerilado
+   dejaba un hueco a la izquierda. Con padding, el fondo cruza toda la
+   pantalla y el contenido igual queda alineado con el del cuerpo.     */
+@media (min-width:1180px){
+  body{padding-left:var(--rail-w)}
+  header{left:0;padding-left:var(--rail-w)}
+  .rail{display:flex}
+  .nav-links{display:none}   /* el rail es el menú; dos menús sobran */
+}
 @media (max-width:960px){
   /* El tablero y la retro NO se apilan: conservan sus columnas y se
      deslizan al costado, como Trello o Miro en el celular. El 82%
@@ -587,7 +686,8 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
 /* ═══════════════════════════════════════════════════════ PRINT ═══ */
 @media print{
   body{background:#fff;color:#000}
-  body::before,header,#progress,.controls,.photo-hint,.card-toggle,footer,.hero-cta,.sprint-top{display:none!important}
+  body{padding-left:0!important}
+  body::before,header,#progress,.bg,.rail,.controls,.photo-hint,.card-toggle,footer,.hero-cta,.sprint-top{display:none!important}
   html[data-view] #view-board{display:none!important}
   html[data-view] #view-timeline{display:block!important}
   .card-body{grid-template-rows:1fr!important}
@@ -603,7 +703,14 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
 
 <body>
 <div id="progress"></div>
-<div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<!-- El canvas es la aurora; las cuatro <i> son las nubes CSS de respaldo -->
+<div class="bg" aria-hidden="true"><canvas id="aurora"></canvas><i></i><i></i><i></i><i></i></div>
+
+<!-- Rail de navegación. Los <a> se generan en JS desde los mismos links
+     de la barra de arriba, así hay una sola lista de secciones. -->
+<nav class="rail" id="rail" aria-label="Secciones">
+  <ul class="rail-list" id="railList"></ul>
+</nav>
 
 <!-- ══════════════════════════════════════════════════════ NAV ═══ -->
 <header id="site-header">
@@ -827,7 +934,11 @@ const DATA = {
   certs: [
     { n:"IBM Agile Achiever · Advanced",           org:"IBM Agile Academy", y:"2021",
       url:"https://www.credly.com/badges/2427f6a0-f9c3-4dad-af07-8057990c388e/public_url" },
-    { n:"AWS Certified Cloud Practitioner",        org:"Amazon Web Services", y:"2027",
+    /* Esta no lleva año de emisión sino vigencia, y eso cambia según el
+       idioma: por eso yEs/yEn en vez de y. Decía "2027" a secas y se leía
+       como si la hubiera sacado en el futuro. */
+    { n:"AWS Certified Cloud Practitioner",        org:"Amazon Web Services",
+      yEs:"vigente hasta 2027", yEn:"valid through 2027",
       url:"https://www.credly.com/badges/744201ed-449a-42b8-9e0c-b6be305587ec/public_url" },
     { n:"Enterprise Design Thinking Practitioner", org:"IBM", y:"2022",
       url:"https://www.credly.com/badges/324e3ef5-25a8-4c4f-9fba-4da0e1f2efda/public_url" },
@@ -971,8 +1082,8 @@ const DATA = {
     },
     {
       org:"VISMA", phase:"transicion",
-      es:{ role:"Smalltalk Developer & Scrum Master Support", period:"Mar 2019 – Sep 2020", place:"Buenos Aires, Argentina" },
-      en:{ role:"Smalltalk Developer & Scrum Master Support", period:"Mar 2019 – Sep 2020", place:"Buenos Aires, Argentina" },
+      es:{ role:"Smalltalk Software Developer & Scrum Master Support", period:"Mar 2019 – Sep 2020", place:"Buenos Aires, Argentina" },
+      en:{ role:"Smalltalk Software Developer & Scrum Master Support", period:"Mar 2019 – Sep 2020", place:"Buenos Aires, Argentina" },
       tags:["tecnico","scrum","stakeholders"],
       metrics:[],
       bullets:{
@@ -1124,8 +1235,8 @@ const DATA = {
   edu: [
     { status:"cert", statusEs:"Certificación", statusEn:"Certification",
       url:"https://www.credly.com/badges/5a9f0594-d0cf-4303-977c-a6d1d9ad4c9a/public_url",
-      es:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org" },
-      en:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org" } },
+      es:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org · 2026" },
+      en:{ t:"Professional Scrum Master II (PSM II)", s:"Scrum.org · 2026" } },
     { status:"done", statusEs:"Finalizado", statusEn:"Completed",
       es:{ t:"Tecnicatura Superior en Programación", s:"Teclab · Instituto Técnico Superior" },
       en:{ t:"Higher Technical Degree in Programming", s:"Teclab · Instituto Técnico Superior" } },
@@ -1143,7 +1254,7 @@ const I18N = {
     "hero.location":"GBA · Buenos Aires · Argentina",
     "hero.role":"Agile Project Manager & Scrum Master · PSM II",
     "hero.tagline":"De construir software a liderar a quienes lo construyen.",
-    "hero.summary":"Lidero equipos ágiles y gestiono proyectos tecnológicos traduciendo las necesidades del negocio en algo que los equipos puedan ejecutar. Especialista en Scrum y Kanban, con foco en facilitación, gestión de dependencias, seguimiento de métricas y mejora continua. Ocho años como developer me dieron algo que no se aprende en un curso: entender los contextos complejos desde adentro y acompañar a los equipos con criterio técnico propio.",
+    "hero.summary":"Lidero equipos ágiles y gestiono proyectos tecnológicos traduciendo las necesidades del negocio en algo que los equipos puedan ejecutar. Especialista en Scrum y Kanban, con foco en facilitación, gestión de dependencias, seguimiento de métricas de flujo y entrega (lead time, cycle time) y mejora continua. Ocho años como developer me dieron algo que no se aprende en un curso: entender los contextos complejos desde adentro y acompañar a los equipos con criterio técnico propio.",
     "hero.cta1":"Hablemos",
     "hero.cta2":"Descargar CV",
     "hero.photoHint":"Foto pendiente",
@@ -1152,7 +1263,7 @@ const I18N = {
     "fb.intro":"En una Review el feedback no lo da quien construyó: lo dan quienes recibieron el trabajo. Estas son sus palabras.",
 
     "review.title":"Lo que entregué",
-    "review.intro":"Quince años en tecnología: ocho escribiendo código y siete cuidando el proceso que lo hace posible. Explorá la trayectoria como línea de tiempo o como tablero — los mismos datos, dos formas de leerlos. Hacé click en cualquier tarjeta para ver el detalle.",
+    "review.intro":"Quince años en tecnología: ocho construyendo software y más de seis liderando a los equipos que lo construyen. Explorá la trayectoria como línea de tiempo o como tablero — los mismos datos, dos formas de leerlos. Hacé click en cualquier tarjeta para ver el detalle.",
     "review.ceremony":"En una Review no se muestra lo que se planeó: se muestra lo que efectivamente se construyó.",
     "review.filterLabel":"Filtrar por:",
     "review.viewTimeline":"Línea de tiempo",
@@ -1194,7 +1305,7 @@ const I18N = {
     "hero.location":"Greater Buenos Aires · Argentina",
     "hero.role":"Agile Project Manager & Scrum Master · PSM II",
     "hero.tagline":"From building software to leading the people who build it.",
-    "hero.summary":"I lead agile teams and manage technology projects, turning business needs into something teams can actually deliver. Specialist in Scrum and Kanban, focused on facilitation, dependency management, metrics tracking and continuous improvement. Eight years as a developer gave me something no course teaches: understanding complex contexts from the inside and guiding teams with real technical judgement.",
+    "hero.summary":"I lead agile teams and manage technology projects, turning business needs into something teams can actually deliver. Specialist in Scrum and Kanban, focused on facilitation, dependency management, flow and delivery metrics (lead time, cycle time) and continuous improvement. Eight years as a developer gave me something no course teaches: understanding complex contexts from the inside and guiding teams with real technical judgement.",
     "hero.cta1":"Get in touch",
     "hero.cta2":"Download CV",
     "hero.photoHint":"Photo pending",
@@ -1203,7 +1314,7 @@ const I18N = {
     "fb.intro":"In a Review, feedback doesn't come from whoever built it — it comes from the people who received the work. These are their words.",
 
     "review.title":"What I delivered",
-    "review.intro":"Fifteen years in technology: eight writing code and seven shaping the process that makes it possible. Explore my career as a timeline or as a board — same data, two ways to read it. Click any card for the detail.",
+    "review.intro":"Fifteen years in technology: eight building software and more than six leading the teams that build it. Explore my career as a timeline or as a board — same data, two ways to read it. Click any card for the detail.",
     "review.ceremony":"A Review doesn't show what was planned. It shows what was actually built.",
     "review.filterLabel":"Filter by:",
     "review.viewTimeline":"Timeline",
@@ -1442,6 +1553,10 @@ function renderVerified(){
 // Link a la insignia en Credly; si no se cargó una URL propia, cae al perfil.
 const badgeUrl = url => url || DATA.credly;
 
+// Año de la insignia. Algunas no tienen año de emisión sino vigencia, y esa
+// frase cambia según el idioma: para esas se cargan yEs/yEn en vez de y.
+const certYear = c => (lang === 'es' ? c.yEs : c.yEn) ?? c.y;
+
 function renderLangs(){
   const box = document.getElementById('langs');
   if (!DATA.langs || !DATA.langs.length){ box.hidden = true; return; }
@@ -1484,7 +1599,7 @@ function renderCerts(){
     </div>
     <div class="certs-grid">
       ${DATA.certs.map(c => `<a class="cert-item" href="${badgeUrl(c.url)}" target="_blank" rel="noopener">${seal}
-        <div><div class="cert-n">${c.n}</div><div class="cert-o">${c.org} · ${c.y}</div></div>
+        <div><div class="cert-n">${c.n}</div><div class="cert-o">${c.org} · ${certYear(c)}</div></div>
         <svg class="cert-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
       </a>`).join('')}
     </div>`;
@@ -1501,6 +1616,248 @@ function renderAll(){
   renderEdu(); renderCerts(); renderVerified(); renderLangs(); renderDaily();
   observeReveals();
 }
+
+/* ══════════════════════════════════════════════════════ AURORA ═══
+   Fondo animado en WebGL2. El shader es el de Aurora de reactbits.dev,
+   copiado tal cual; lo que se reescribió es el envoltorio, que allá es
+   un componente de React sobre la librería ogl. Acá es WebGL a mano
+   para no meter dependencias ni build en un archivo que se abre con
+   doble click.
+
+   Si algo falla —no hay WebGL2, el contexto no compila— la función
+   se va sin tocar nada y quedan las nubes CSS. Nunca pantalla negra.
+
+   Para retocarlo: AURORA_CFG. Los colores salen de la paleta del
+   sitio, no de los violetas del demo original.                       */
+const AURORA_CFG = {
+  colorStops: ['#3987e5', '#4fd6a5', '#7c5cff'],  // azul → acento → violeta
+  amplitude: 1.0,    // cuánto ondula la cortina
+  blend: 0.5,        // qué tan difuso es el borde de abajo
+  speed: 0.8,        // 1.0 es la velocidad del demo; acá va más calmo
+  maxDpr: 1.5        // techo de resolución: arriba de esto no se nota y cuesta
+};
+
+(function initAurora(){
+  const canvas = document.getElementById('aurora');
+  const bg = document.querySelector('.bg');
+  if (!canvas || !bg) return;
+
+  const gl = canvas.getContext('webgl2', {
+    alpha:true, premultipliedAlpha:true, antialias:true
+  });
+  if (!gl) return;   // sin WebGL2 mandan las nubes
+
+  // String.raw para que sobrevivan las barras invertidas de COLOR_RAMP:
+  // en un template normal, "\" + salto de línea se come el salto.
+  const VERT = String.raw`#version 300 es
+in vec2 position;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+`;
+
+  const FRAG = String.raw`#version 300 es
+precision highp float;
+
+uniform float uTime;
+uniform float uAmplitude;
+uniform vec3 uColorStops[3];
+uniform vec2 uResolution;
+uniform float uBlend;
+
+out vec4 fragColor;
+
+vec3 permute(vec3 x) {
+  return mod(((x * 34.0) + 1.0) * x, 289.0);
+}
+
+float snoise(vec2 v){
+  const vec4 C = vec4(
+      0.211324865405187, 0.366025403784439,
+      -0.577350269189626, 0.024390243902439
+  );
+  vec2 i  = floor(v + dot(v, C.yy));
+  vec2 x0 = v - i + dot(i, C.xx);
+  vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+  i = mod(i, 289.0);
+
+  vec3 p = permute(
+      permute(i.y + vec3(0.0, i1.y, 1.0))
+    + i.x + vec3(0.0, i1.x, 1.0)
+  );
+
+  vec3 m = max(
+      0.5 - vec3(
+          dot(x0, x0),
+          dot(x12.xy, x12.xy),
+          dot(x12.zw, x12.zw)
+      ),
+      0.0
+  );
+  m = m * m;
+  m = m * m;
+
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+  m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+
+  vec3 g;
+  g.x  = a0.x  * x0.x  + h.x  * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}
+
+struct ColorStop {
+  vec3 color;
+  float position;
+};
+
+#define COLOR_RAMP(colors, factor, finalColor) {              \
+  int index = 0;                                            \
+  for (int i = 0; i < 2; i++) {                               \
+     ColorStop currentColor = colors[i];                    \
+     bool isInBetween = currentColor.position <= factor;    \
+     index = int(mix(float(index), float(i), float(isInBetween))); \
+  }                                                         \
+  ColorStop currentColor = colors[index];                   \
+  ColorStop nextColor = colors[index + 1];                  \
+  float range = nextColor.position - currentColor.position; \
+  float lerpFactor = (factor - currentColor.position) / range; \
+  finalColor = mix(currentColor.color, nextColor.color, lerpFactor); \
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uResolution;
+
+  ColorStop colors[3];
+  colors[0] = ColorStop(uColorStops[0], 0.0);
+  colors[1] = ColorStop(uColorStops[1], 0.5);
+  colors[2] = ColorStop(uColorStops[2], 1.0);
+
+  vec3 rampColor;
+  COLOR_RAMP(colors, uv.x, rampColor);
+
+  float height = snoise(vec2(uv.x * 2.0 + uTime * 0.1, uTime * 0.25)) * 0.5 * uAmplitude;
+  height = exp(height);
+  height = (uv.y * 2.0 - height + 0.2);
+  float intensity = 0.6 * height;
+
+  float midPoint = 0.20;
+  float auroraAlpha = smoothstep(midPoint - uBlend * 0.5, midPoint + uBlend * 0.5, intensity);
+
+  vec3 auroraColor = intensity * rampColor;
+
+  fragColor = vec4(auroraColor * auroraAlpha, auroraAlpha);
+}
+`;
+
+  function compile(type, src){
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
+      console.warn('Aurora: shader no compiló —', gl.getShaderInfoLog(sh));
+      return null;
+    }
+    return sh;
+  }
+
+  const vs = compile(gl.VERTEX_SHADER, VERT);
+  const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if (!vs || !fs) return;
+
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    console.warn('Aurora: el programa no linkeó —', gl.getProgramInfoLog(prog));
+    return;
+  }
+  gl.useProgram(prog);
+
+  // Un solo triángulo que se pasa de la pantalla: cubre todo el viewport
+  // con la mitad de fragmentos de borde que dos triángulos.
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'position');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  const U = {
+    time:  gl.getUniformLocation(prog, 'uTime'),
+    amp:   gl.getUniformLocation(prog, 'uAmplitude'),
+    stops: gl.getUniformLocation(prog, 'uColorStops'),
+    res:   gl.getUniformLocation(prog, 'uResolution'),
+    blend: gl.getUniformLocation(prog, 'uBlend')
+  };
+
+  const hexToRgb = hex => {
+    const h = hex.replace('#','');
+    return [
+      parseInt(h.slice(0,2),16)/255,
+      parseInt(h.slice(2,4),16)/255,
+      parseInt(h.slice(4,6),16)/255
+    ];
+  };
+  gl.uniform3fv(U.stops, new Float32Array(AURORA_CFG.colorStops.flatMap(hexToRgb)));
+  gl.uniform1f(U.amp, AURORA_CFG.amplitude);
+  gl.uniform1f(U.blend, AURORA_CFG.blend);
+
+  gl.clearColor(0,0,0,0);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, AURORA_CFG.maxDpr);
+    const w = Math.max(1, Math.round(canvas.clientWidth  * dpr));
+    const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    if (canvas.width === w && canvas.height === h) return;
+    canvas.width = w; canvas.height = h;
+    gl.viewport(0, 0, w, h);
+    // gl_FragCoord viene en píxeles del buffer, así que uResolution
+    // tiene que ser el buffer y no el tamaño CSS. Si no, el ruido
+    // cambia de escala según la densidad de la pantalla.
+    gl.uniform2f(U.res, w, h);
+  }
+
+  function draw(seconds){
+    gl.uniform1f(U.time, seconds);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+
+  bg.classList.add('gl');   // apaga las nubes CSS
+  resize();
+  window.addEventListener('resize', resize, { passive:true });
+
+  const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  let raf = 0;
+  const loop = now => { raf = requestAnimationFrame(loop); resize(); draw(now * 0.001 * AURORA_CFG.speed); };
+
+  function arrancar(){
+    if (quieto.matches){
+      // Movimiento reducido: un solo cuadro y listo. Una aurora quieta
+      // se lee como una decisión; unas nubes congeladas, como un bug.
+      cancelAnimationFrame(raf); raf = 0;
+      resize(); draw(0);
+      return;
+    }
+    if (!raf) raf = requestAnimationFrame(loop);
+  }
+  function frenar(){ cancelAnimationFrame(raf); raf = 0; }
+
+  // En una pestaña de fondo no hay nada que mirar: no gastes batería.
+  document.addEventListener('visibilitychange', () => document.hidden ? frenar() : arrancar());
+  quieto.addEventListener('change', arrancar);
+  arrancar();
+})();
 
 /* ══════════════════════════════════════════════ INTERACCIONES ═══ */
 document.querySelectorAll('.lang-switch button').forEach(b => {
@@ -1556,6 +1913,140 @@ const bar = document.getElementById('progress');
 const navA = [...document.querySelectorAll('#navlinks a')];
 const secs = navA.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
 
+/* ═══════════════════════════════ RAIL DE NAVEGACIÓN (LineSidebar) ═══
+   Adaptación del LineSidebar de reactbits.dev. Cada sección tiene un
+   número, una raya y una etiqueta; el conjunto se lee como una escala.
+
+   El efecto es de CERCANÍA: cada ítem lleva una variable CSS --effect
+   entre 0 y 1 que el mouse empuja hacia arriba según lo cerca que
+   pase. El CSS hace el resto —color, corrimiento, largo de la raya—
+   así que el JS solo mueve un número por ítem.
+
+   El ítem de la sección en la que estás queda fijo en 1, aunque el
+   mouse esté lejos: además de menú, el rail dice dónde estás parado.
+
+   Antes acá vivía el Option Wheel del mismo sitio. Se cambió porque
+   era un selector, no un menú: cinco opciones en arco, rotadas y
+   desenfocadas, se leían chicas y decorativas.                       */
+const RAIL = {
+  radius: 120,       // px de alcance del efecto de cercanía
+  smoothing: 100,    // constante de tiempo del suavizado, en ms
+  falloff: 'smooth'  // 'linear' | 'smooth' | 'sharp'
+};
+
+/* Curvas de caída, las tres del original. 't' llega en 0..1, donde 1
+   es "el mouse está justo encima". */
+const RAIL_FALLOFF = {
+  linear: t => t,
+  smooth: t => t * t * (3 - 2 * t),   // smoothstep: arranca y termina suave
+  sharp:  t => t * t * t              // solo se enciende muy cerca
+};
+
+const rail = document.getElementById('rail');
+const railList = document.getElementById('railList');
+const railItems = [];
+
+if (rail && railList && secs.length === navA.length){
+  navA.forEach((a, i) => {
+    const li = document.createElement('li');
+    li.className = 'rail-item';
+    li.innerHTML =
+      `<a class="rail-link" href="${a.getAttribute('href')}">` +
+        `<span class="rail-marker" aria-hidden="true"></span>` +
+        `<span class="rail-text">` +
+          `<span class="rail-index" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>` +
+          `<span class="rail-label" data-i18n="${a.dataset.i18n}"></span>` +
+        `</span>` +
+      `</a>`;
+    railList.appendChild(li);
+    railItems.push(li);
+  });
+}
+
+const railQuieto = window.matchMedia('(prefers-reduced-motion: reduce)');
+let railActive = 0;
+let railTargets = railItems.map(() => 0);
+let railCurrent = railItems.map(() => 0);
+let railRaf = 0, railLast = 0;
+
+function railPaint(){
+  railItems.forEach((el, i) => {
+    el.style.setProperty('--effect', railCurrent[i].toFixed(4));
+    el.classList.toggle('is-active', i === railActive);
+    const link = el.querySelector('.rail-link');
+    if (i === railActive) link.setAttribute('aria-current', 'true');
+    else link.removeAttribute('aria-current');
+  });
+}
+
+/* Suavizado exponencial: independiente de los fps, a diferencia de
+   sumar una fracción fija por cuadro. */
+function railFrame(now){
+  const dt = Math.min((now - railLast) / 1000, .05);
+  railLast = now;
+  const k = 1 - Math.exp(-dt / (Math.max(RAIL.smoothing, 1) / 1000));
+  let quieto = true;
+  for (let i = 0; i < railCurrent.length; i++){
+    const d = railTargets[i] - railCurrent[i];
+    if (Math.abs(d) < .001){ railCurrent[i] = railTargets[i]; continue; }
+    railCurrent[i] += d * k;
+    quieto = false;
+  }
+  railPaint();
+  railRaf = quieto ? 0 : requestAnimationFrame(railFrame);
+}
+
+function railAnimar(){
+  if (railQuieto.matches){ railCurrent = railTargets.slice(); railPaint(); return; }
+  if (!railRaf){ railLast = performance.now(); railRaf = requestAnimationFrame(railFrame); }
+}
+
+/* El objetivo de cada ítem es lo más alto entre su cercanía al mouse y
+   estar activo. Así el activo nunca se apaga al pasar el mouse por otro. */
+let railPointerY = null;   // última posición del mouse, null si está afuera
+
+function railApuntar(pointerY = railPointerY){
+  railPointerY = pointerY;
+  const curva = RAIL_FALLOFF[RAIL.falloff] || RAIL_FALLOFF.smooth;
+  railItems.forEach((el, i) => {
+    let prox = 0;
+    if (pointerY !== null){
+      const r = el.getBoundingClientRect();
+      // Distancia vertical al centro del renglón: la lista es vertical,
+      // medir también en horizontal solo agregaría ruido.
+      const dist = Math.abs(pointerY - (r.top + r.height / 2));
+      if (dist < RAIL.radius) prox = curva(1 - dist / RAIL.radius);
+    }
+    railTargets[i] = Math.max(prox, i === railActive ? 1 : 0);
+  });
+  railAnimar();
+}
+
+function railGoto(i){
+  const s = secs[i];
+  if (!s) return;
+  s.scrollIntoView({ behavior: railQuieto.matches ? 'auto' : 'smooth', block:'start' });
+}
+
+if (railItems.length){
+  railActive = 0;
+  railApuntar(null);
+  railCurrent = railTargets.slice();
+  railPaint();
+
+  railItems.forEach((el, i) => {
+    el.querySelector('.rail-link').addEventListener('click', e => {
+      e.preventDefault();   // scrollIntoView respeta el scroll-padding-top
+      railActive = i; railApuntar(null); railGoto(i);
+    });
+  });
+
+  rail.addEventListener('pointermove', e => railApuntar(e.clientY));
+  rail.addEventListener('pointerleave', () => railApuntar(null));
+  railQuieto.addEventListener('change', () => railApuntar(null));
+}
+
+
 function onScroll(){
   const y = window.scrollY;
   header.classList.toggle('scrolled', y > 12);
@@ -1564,6 +2055,15 @@ function onScroll(){
   let cur = -1;
   secs.forEach((s, i) => { if (s.getBoundingClientRect().top <= 140) cur = i; });
   navA.forEach((a, i) => a.classList.toggle('active', i === cur));
+  // El rail marca la sección en la que estás. No hace falta candado como
+  // con el wheel: acá el scroll solo cambia cuál está activo, no pelea
+  // con ninguna animación de arrastre.
+  if (railItems.length){
+    const act = Math.max(0, cur);
+    // Sin argumento: conserva dónde está el mouse, así scrollear con el
+    // puntero sobre el rail no apaga el realce de cercanía.
+    if (act !== railActive){ railActive = act; railApuntar(); }
+  }
 }
 window.addEventListener('scroll', onScroll, { passive:true });
 

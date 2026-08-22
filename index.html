@@ -549,42 +549,74 @@ html[data-view="board"] #view-board{display:block}
 .retro-icon svg{width:14px;height:14px}
 .retro-title{font-size:13.4px;font-weight:600;letter-spacing:-.01em;color:var(--text-primary);line-height:1.3}
 .retro-sub{font-size:11px;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;margin-top:1px}
-.retro-notes{display:flex;flex-direction:column;gap:20px}
+.retro-notes{display:flex;flex-direction:column;gap:24px}
 
-/* ── Post-it colgado de una chinche ── */
+/* ── Post-it con la esquina despegada (StickerPeel de reactbits) ──
+   El original despega TODA la banda de arriba de la calcomanía y usa
+   GSAP, GSAP Draggable y filtros SVG de iluminación especular.
+
+   Acá hay dos cambios grandes, los dos a propósito:
+
+   1. Se despega solo LA ESQUINA, no la banda entera. En el original la
+      calcomanía es una imagen y taparla a medias no molesta; una nota de
+      la retro es texto que hay que poder leer. Despegar el 30% de arriba
+      te comería dos renglones cada vez que pasás el mouse.
+
+   2. Nada de GSAP ni de filtros SVG. El pliegue son dos clip-path: la
+      nota se recorta en diagonal y el triángulo que "se despegó" queda
+      dibujado encima, plegado. Como el dorso del papel es liso, no hace
+      falta duplicar el contenido ni espejarlo como hace el original.
+
+   Reemplaza a la chinche que estaba antes. Un post-it no cuelga de un
+   alfiler: se pega y se le levanta la punta. La versión vieja (chinche +
+   balanceo al hacer click) está documentada en 02-sitio/README.md.     */
 .note{
   --rot:0deg;
-  position:relative;margin-top:9px;padding:19px 17px 16px;
-  border-radius:3px;                                   /* papel, no tarjeta */
-  background:color-mix(in srgb,var(--rc) 15%,var(--surface-2));
-  border:1px solid color-mix(in srgb,var(--rc) 32%,transparent);
-  box-shadow:0 8px 18px -8px rgba(0,0,0,.75);
+  --peel:0px;                 /* lado del triángulo despegado */
+  position:relative;
   transform:rotate(var(--rot));
-  transform-origin:50% 0;                              /* pivota en la chinche */
-  transition:transform .25s var(--ease),box-shadow .25s var(--ease);
+  /* drop-shadow y no box-shadow: la sombra tiene que seguir la silueta
+     recortada por el clip-path, si no delata el rectángulo de abajo. */
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,.6));
+  transition:transform .3s var(--ease),filter .3s var(--ease);
   cursor:pointer;
 }
-/* La chinche */
-.note::before{
-  content:'';position:absolute;top:-7px;left:50%;margin-left:-6px;
-  width:12px;height:12px;border-radius:50%;z-index:2;
-  background:radial-gradient(circle at 34% 30%,#fff 0 14%,var(--rc) 46%,color-mix(in srgb,var(--rc) 55%,#000) 100%);
-  box-shadow:0 2px 5px rgba(0,0,0,.65);
-}
 .note:hover{
+  --peel:30px;
   transform:rotate(var(--rot)) translateY(-3px);
-  box-shadow:0 15px 28px -10px rgba(0,0,0,.85);
+  filter:drop-shadow(0 16px 26px rgba(0,0,0,.75));
 }
-@keyframes pin-swing{
-  0%  {transform:rotate(var(--rot))}
-  18% {transform:rotate(calc(var(--rot) + 7deg))}
-  38% {transform:rotate(calc(var(--rot) - 5deg))}
-  56% {transform:rotate(calc(var(--rot) + 3.2deg))}
-  74% {transform:rotate(calc(var(--rot) - 1.8deg))}
-  88% {transform:rotate(calc(var(--rot) + .8deg))}
-  100%{transform:rotate(var(--rot))}
+/* Al hacer click se despega más y queda así: es la única forma de que el
+   efecto exista en un celular, donde no hay hover. */
+.note.peeled{--peel:40px}
+.note-paper{
+  --spot-color:rgba(255,255,255,.07);   /* el brillo del halo, en papel */
+  padding:19px 17px 16px;
+  border-radius:3px;                                   /* papel, no tarjeta */
+  background:linear-gradient(158deg,
+    color-mix(in srgb,var(--rc) 19%,var(--surface-2)),
+    color-mix(in srgb,var(--rc) 11%,var(--surface-2)));
+  border:1px solid color-mix(in srgb,var(--rc) 32%,transparent);
+  /* La esquina de abajo a la derecha se recorta en diagonal: es el pedazo
+     que se despegó y ya no está apoyado. */
+  clip-path:polygon(0 0, 100% 0,
+                    100% calc(100% - var(--peel)),
+                    calc(100% - var(--peel)) 100%, 0 100%);
+  transition:clip-path .34s var(--ease);
 }
-.note.swing{animation:pin-swing .95s var(--ease)}
+/* El mismo triángulo, plegado sobre la nota: es el DORSO del papel, por
+   eso va más apagado y sin texto. La sombra apunta arriba y a la
+   izquierda, que es hacia donde cae la punta levantada. */
+.note-curl{
+  position:absolute;right:0;bottom:0;
+  width:var(--peel);height:var(--peel);
+  clip-path:polygon(100% 0, 0 100%, 0 0);
+  background:linear-gradient(135deg,
+    color-mix(in srgb,var(--rc) 4%,var(--surface-3)),
+    color-mix(in srgb,var(--rc) 24%,var(--surface-2)));
+  filter:drop-shadow(-3px -3px 4px rgba(0,0,0,.55));
+  transition:width .34s var(--ease),height .34s var(--ease);
+}
 .note-lead{font-size:14.2px;font-weight:600;letter-spacing:-.015em;color:var(--text-primary);margin-bottom:6px;line-height:1.4}
 .note-text{font-size:13.4px;color:var(--text-secondary);line-height:1.58}
 
@@ -690,6 +722,8 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   .reveal{opacity:1;transform:none}
   .note{--rot:0deg}
   .note:hover{transform:none}
+  /* El pliegue es un cambio de estado, no movimiento: se deja, pero seco */
+  .note-paper,.note-curl{transition:none}
   .bg i{animation:none}
   .menu-links a{transition-delay:0ms!important;opacity:1;transform:none}
   .spot::after{transition:none}
@@ -1658,7 +1692,13 @@ function renderRetro(){
         ${col.notes.map((n, i) => { const x = L(n);
           // Rotaciones fijas para que el tablero se vea puesto a mano, no al azar
           const rot = [-1.6, 1.2, -0.7, 1.7, -1.1][(ci * 2 + i) % 5];
-          return `<div class="note" style="--rot:${rot}deg"><div class="note-lead">${x.lead}</div><div class="note-text">${x.text}</div></div>`;
+          return `<div class="note" style="--rot:${rot}deg">
+            <div class="note-paper spot">
+              <div class="note-lead">${x.lead}</div>
+              <div class="note-text">${x.text}</div>
+            </div>
+            <span class="note-curl" aria-hidden="true"></span>
+          </div>`;
         }).join('')}
       </div>
     </div>`;
@@ -1783,7 +1823,7 @@ function renderAll(){
 const AURORA_CFG = {
   colorStops: ['#3987e5', '#4fd6a5', '#7c5cff'],  // azul → acento → violeta
   amplitude: 1.0,    // cuánto ondula la cortina
-  blend: 0.5,        // qué tan difuso es el borde de abajo
+  blend: 0.7,        // qué tan difuso es el borde de abajo
   speed: 0.8,        // 1.0 es la velocidad del demo; acá va más calmo
   maxDpr: 1.5        // techo de resolución: arriba de esto no se nota y cuesta
 };
@@ -2128,15 +2168,12 @@ document.addEventListener('click', e => {
   });
 });
 
-/* Click en un post-it: se balancea colgando de la chinche */
+/* Click en un post-it: le despega la punta y se la deja despegada.
+   En escritorio el hover ya lo hace solo; esto existe para el celular,
+   donde no hay hover y si no el efecto no existiría nunca. */
 document.addEventListener('click', e => {
   const note = e.target.closest('.note'); if (!note) return;
-  note.classList.remove('swing');
-  void note.offsetWidth;                       // reinicia la animación si ya estaba corriendo
-  note.classList.add('swing');
-});
-document.addEventListener('animationend', e => {
-  if (e.animationName === 'pin-swing') e.target.classList.remove('swing');
+  note.classList.toggle('peeled');
 });
 
 let io;

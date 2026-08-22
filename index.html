@@ -7,6 +7,12 @@
 
   Archivo único y autocontenido. No necesita servidor ni dependencias.
 
+  Cinco componentes vienen de reactbits.dev y están REESCRITOS sin React
+  ni sus librerías, para no meter un build acá adentro:
+    Aurora (fondo) · LineSidebar (rail izquierdo) · CountUp (KPIs)
+    SpotlightCard (tarjetas) · menú hamburguesa de celular
+  Qué se respetó de cada original y qué se cambió: 02-sitio/README.md
+
   ══ CÓMO EDITARLO ══════════════════════════════════════════════════════════
   Todo el contenido vive en el objeto DATA (buscá "const DATA" más abajo).
   Cada texto tiene su versión "es" y "en".
@@ -256,6 +262,76 @@ header.scrolled{border-bottom-color:var(--line-soft);background:rgba(12,16,21,.9
   transform-origin:left center;
   transform:translateY(-50%) scaleX(calc(.7 + var(--effect,0) * .6));
 }
+
+/* ═══════════════════════════════════ SPOTLIGHT (SpotlightCard) ═══
+   Halo suave que sigue al cursor por encima de una tarjeta.
+   Adaptación del SpotlightCard de reactbits.dev: el componente original
+   no tiene dependencias, solo escribe la posición del mouse en dos
+   variables CSS. Acá es exactamente lo mismo, con un solo listener
+   delegado en vez de uno por tarjeta.
+
+   Se pone agregando la clase .spot a cualquier superficie.            */
+.spot{position:relative;overflow:hidden}
+.spot::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  opacity:0;transition:opacity .45s var(--ease);
+  background:radial-gradient(circle 240px at var(--mx,50%) var(--my,50%),
+             var(--spot-color,rgba(79,214,165,.13)), transparent 72%);
+}
+.spot:hover::after,.spot:focus-visible::after{opacity:1}
+/* El halo se pinta en z-index 0, así que el contenido tiene que subir */
+.spot > *{position:relative;z-index:1}
+/* Cada experiencia se ilumina con el color de SU fase: el halo refuerza
+   el código de color del tablero en vez de competirle. */
+.card.spot::after{
+  background:radial-gradient(circle 260px at var(--mx,50%) var(--my,50%),
+             color-mix(in srgb,var(--phase-color) 15%,transparent), transparent 70%);
+}
+
+/* ══════════════════════════════════════ MENÚ MÓVIL (hamburguesa) ═══
+   Por debajo de 960px el sitio no tenía NINGUNA navegación: ni rail ni
+   links, solo scrollear. Esto tapa ese agujero.
+   Inspirado en el StaggeredMenu de reactbits.dev, reescrito sin GSAP:
+   los links entran escalonados con un transition-delay por índice.
+
+   El panel arranca DEBAJO del header (top:66px) y se queda en un
+   z-index más bajo, así el botón de cerrar nunca queda tapado.        */
+.menu-btn{
+  display:none;width:38px;height:38px;border-radius:10px;
+  border:1px solid var(--line);background:var(--surface-1);
+  flex-direction:column;align-items:center;justify-content:center;gap:4.5px;
+  flex-shrink:0;transition:border-color .2s var(--ease);
+}
+.menu-btn:hover{border-color:var(--text-muted)}
+.menu-btn span{
+  display:block;width:16px;height:1.5px;border-radius:1px;background:var(--text-secondary);
+  transition:transform .28s var(--ease),opacity .18s var(--ease);
+}
+.menu-btn[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.menu-btn[aria-expanded="true"] span:nth-child(2){opacity:0}
+.menu-btn[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.menu-panel{
+  position:fixed;top:66px;left:0;right:0;bottom:0;z-index:90;
+  background:rgba(12,16,21,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  padding:26px 24px 40px;overflow-y:auto;
+  opacity:0;transition:opacity .26s var(--ease);
+}
+.menu-panel.open{opacity:1}
+.menu-links{display:flex;flex-direction:column;gap:2px}
+.menu-links a{
+  display:flex;align-items:baseline;gap:14px;
+  padding:17px 6px;border-bottom:1px solid var(--line-soft);
+  font-size:20px;letter-spacing:-.022em;color:var(--text-primary);
+  opacity:0;transform:translateY(14px);
+  transition:opacity .34s var(--ease),transform .34s var(--ease),color .2s var(--ease);
+  transition-delay:calc(var(--i) * 55ms);
+}
+.menu-panel.open .menu-links a{opacity:1;transform:none}
+.menu-links a::before{
+  content:attr(data-n);font-family:var(--mono);font-size:12px;color:var(--accent);
+  opacity:.75;flex-shrink:0;
+}
+.menu-links a:active{color:var(--accent)}
 
 /* ════════════════════════════════════════════════════════ HERO ═══ */
 .hero{padding:142px 0 46px}
@@ -615,6 +691,8 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   .note{--rot:0deg}
   .note:hover{transform:none}
   .bg i{animation:none}
+  .menu-links a{transition-delay:0ms!important;opacity:1;transform:none}
+  .spot::after{transition:none}
   /* Sin foco: el título vuelve a color sólido, no a medio degradado */
   .hero h1 .n1,.hero h1 .light{
     background-image:none;-webkit-text-fill-color:currentColor;color:var(--text-primary);
@@ -638,7 +716,12 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   .rail{display:flex}
   .nav-links{display:none}   /* el rail es el menú; dos menús sobran */
 }
+@media (min-width:961px){
+  /* El panel es exclusivo del celular: en escritorio no existe nunca */
+  .menu-panel{display:none!important}
+}
 @media (max-width:960px){
+  .menu-btn{display:flex}
   /* El tablero y la retro NO se apilan: conservan sus columnas y se
      deslizan al costado, como Trello o Miro en el celular. El 82%
      de ancho deja asomar la columna siguiente para que se note. */
@@ -687,7 +770,7 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
 @media print{
   body{background:#fff;color:#000}
   body{padding-left:0!important}
-  body::before,header,#progress,.bg,.rail,.controls,.photo-hint,.card-toggle,footer,.hero-cta,.sprint-top{display:none!important}
+  body::before,header,#progress,.bg,.rail,.menu-btn,.menu-panel,.controls,.photo-hint,.card-toggle,footer,.hero-cta,.sprint-top{display:none!important}
   html[data-view] #view-board{display:none!important}
   html[data-view] #view-timeline{display:block!important}
   .card-body{grid-template-rows:1fr!important}
@@ -731,9 +814,19 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
         <button data-lang="es" aria-pressed="true">ES</button>
         <button data-lang="en" aria-pressed="false">EN</button>
       </div>
+      <!-- Solo visible por debajo de 960px -->
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menuPanel" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
+
+<!-- Panel del menú móvil. Los links se generan en JS desde los mismos
+     de la barra, así sigue habiendo una sola lista de secciones. -->
+<div class="menu-panel" id="menuPanel" hidden>
+  <nav class="menu-links" id="menuLinks" aria-label="Secciones"></nav>
+</div>
 
 <main id="top">
 
@@ -1425,13 +1518,71 @@ function renderSprint(){
     </div>`;
 }
 
+/* ═══════════════════════════════════════════════════════ COUNTUP ═══
+   Los números del hero cuentan desde cero cuando entran en pantalla.
+   Adaptación del CountUp de reactbits.dev: allá el resorte lo pone
+   `motion/react`, acá es un easing sobre requestAnimationFrame, porque
+   meter framer-motion por una animación de dos segundos no se paga.
+
+   Cuenta UNA sola vez por carga. Al cambiar de idioma se vuelve a
+   dibujar todo el hero, y ver los números arrancar de cero de nuevo
+   se leería como un bug, no como un efecto.                          */
+const COUNTUP = { duration: 1600, delay: 120 };
+let countUpDone = false;
+
 function renderKpis(){
-  document.getElementById('kpis').innerHTML = DATA.kpis.map(k => `
+  document.getElementById('kpis').innerHTML = DATA.kpis.map(k => {
+    // Los KPI de texto (PSM II) no se cuentan: no son un número.
+    const valor = k.text
+      ? k.value
+      : `<span class="kpi-num" data-to="${k.value}">${countUpDone ? k.value : '0'}</span>`;
+    return `
     <div class="kpi">
-      <div class="kpi-value${k.text?' is-text':''}">${k.value}${k.unit?`<span class="unit">${k.unit}</span>`:''}</div>
+      <div class="kpi-value${k.text?' is-text':''}">${valor}${k.unit?`<span class="unit">${k.unit}</span>`:''}</div>
       <div class="kpi-label">${L(k)}</div>
       <div class="kpi-note">${lang==='es'?k.noteEs:k.noteEn}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+// easeOutExpo: arranca rápido y frena al final. Es la curva que hace que
+// el número se "asiente" en vez de cortarse de golpe.
+const easeOutExpo = t => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
+function countUpArrancar(){
+  if (countUpDone) return;
+  const nums = [...document.querySelectorAll('.kpi-num')];
+  if (!nums.length) return;
+  countUpDone = true;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    nums.forEach(n => { n.textContent = n.dataset.to; });
+    return;
+  }
+
+  const t0 = performance.now() + COUNTUP.delay;
+  const paso = now => {
+    const t = Math.min(1, Math.max(0, (now - t0) / COUNTUP.duration));
+    const k = easeOutExpo(t);
+    nums.forEach(n => {
+      const to = Number(n.dataset.to);
+      n.textContent = String(Math.round(to * k));
+    });
+    if (t < 1) requestAnimationFrame(paso);
+    else nums.forEach(n => { n.textContent = n.dataset.to; });
+  };
+  requestAnimationFrame(paso);
+}
+
+/* Dispara cuando los KPI entran en pantalla, no al cargar: si contaran
+   arriba de todo antes de que llegues, te perdés el efecto entero. */
+function countUpObservar(){
+  const caja = document.getElementById('kpis');
+  if (!caja) return;
+  const io = new IntersectionObserver(es => {
+    if (es.some(e => e.isIntersecting)){ countUpArrancar(); io.disconnect(); }
+  }, { threshold:.35 });
+  io.observe(caja);
 }
 
 function cardHTML(job, idx){
@@ -1444,7 +1595,7 @@ function cardHTML(job, idx){
       <div class="metric"><div class="metric-value">${m.value}</div><div class="metric-label">${L(m)}</div></div>`).join('')}
     </div>` : '';
   return `
-  <article class="card${isOpen?' open':''}${dimmed}" style="--phase-color:${phase.color}" data-idx="${idx}">
+  <article class="card spot${isOpen?' open':''}${dimmed}" style="--phase-color:${phase.color}" data-idx="${idx}">
     <button class="card-btn" aria-expanded="${isOpen}" aria-controls="body-${idx}">
       <div class="card-top">
         <div>
@@ -1577,10 +1728,10 @@ function renderEdu(){
     const inner = `<span class="edu-status ${e.status}">${lang==='es'?e.statusEs:e.statusEn}</span>
       <h3>${x.t}</h3><p>${x.s}</p>`;
     return e.url
-      ? `<a class="edu is-link" href="${badgeUrl(e.url)}" target="_blank" rel="noopener">${inner}
+      ? `<a class="edu is-link spot" href="${badgeUrl(e.url)}" target="_blank" rel="noopener">${inner}
            <svg class="cert-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
          </a>`
-      : `<div class="edu">${inner}</div>`;
+      : `<div class="edu spot">${inner}</div>`;
   }).join('');
 }
 
@@ -1598,7 +1749,7 @@ function renderCerts(){
       </a>
     </div>
     <div class="certs-grid">
-      ${DATA.certs.map(c => `<a class="cert-item" href="${badgeUrl(c.url)}" target="_blank" rel="noopener">${seal}
+      ${DATA.certs.map(c => `<a class="cert-item spot" href="${badgeUrl(c.url)}" target="_blank" rel="noopener">${seal}
         <div><div class="cert-n">${c.n}</div><div class="cert-o">${c.org} · ${certYear(c)}</div></div>
         <svg class="cert-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
       </a>`).join('')}
@@ -1859,6 +2010,95 @@ void main() {
   arrancar();
 })();
 
+/* ═══════════════════════════════════ SPOTLIGHT (SpotlightCard) ═══
+   Un solo listener delegado en el documento, no uno por tarjeta. Es a
+   propósito: renderAll() rehace todo el DOM al cambiar de idioma, así
+   que los listeners pegados a cada tarjeta se perderían en el cambio.
+
+   La escritura de las variables va estrangulada con requestAnimationFrame:
+   pointermove dispara muchísimo y no tiene sentido tocar el estilo más
+   de una vez por cuadro.                                              */
+(function initSpotlight(){
+  let pendiente = null, raf = 0;
+
+  document.addEventListener('pointermove', e => {
+    const el = e.target.closest?.('.spot');
+    if (!el) return;
+    pendiente = { el, x:e.clientX, y:e.clientY };
+    if (!raf) raf = requestAnimationFrame(() => {
+      raf = 0;
+      if (!pendiente) return;
+      const { el, x, y } = pendiente;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (x - r.left).toFixed(1) + 'px');
+      el.style.setProperty('--my', (y - r.top).toFixed(1) + 'px');
+    });
+  }, { passive:true });
+})();
+
+/* ══════════════════════════════════════ MENÚ MÓVIL (hamburguesa) ═══ */
+(function initMenu(){
+  const btn = document.getElementById('menuBtn');
+  const panel = document.getElementById('menuPanel');
+  const cont = document.getElementById('menuLinks');
+  if (!btn || !panel || !cont) return;
+
+  // Los links salen de la misma lista que la barra: una sola fuente.
+  [...document.querySelectorAll('#navlinks a')].forEach((a, i) => {
+    const el = document.createElement('a');
+    el.href = a.getAttribute('href');
+    el.dataset.i18n = a.dataset.i18n;
+    el.dataset.n = String(i + 1).padStart(2, '0');
+    el.style.setProperty('--i', i);
+    cont.appendChild(el);
+  });
+
+  let abierto = false;
+
+  function abrir(){
+    if (abierto) return;
+    abierto = true;
+    panel.hidden = false;
+    // Un cuadro de gracia: sin esto el navegador no ve el cambio de
+    // display y la transición no arranca.
+    requestAnimationFrame(() => panel.classList.add('open'));
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';   // que no scrollee lo de atrás
+    cont.querySelector('a')?.focus({ preventScroll:true });
+  }
+
+  function cerrar(devolverFoco){
+    if (!abierto) return;
+    abierto = false;
+    panel.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    if (devolverFoco) btn.focus({ preventScroll:true });
+    setTimeout(() => { if (!abierto) panel.hidden = true; }, 280);
+  }
+
+  btn.addEventListener('click', () => abierto ? cerrar(false) : abrir());
+
+  cont.addEventListener('click', e => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    e.preventDefault();
+    cerrar(false);
+    const s = document.querySelector(a.getAttribute('href'));
+    // Esperamos a que el panel se vaya: scrollear por detrás de una
+    // cortina que todavía está ahí se ve raro.
+    setTimeout(() => s?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block:'start'
+    }), 200);
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(true); });
+  // Si agrandás la ventana con el menú abierto, el panel se esconde por
+  // CSS pero el scroll quedaría trabado. Hay que cerrarlo de verdad.
+  window.addEventListener('resize', () => { if (innerWidth > 960) cerrar(false); }, { passive:true });
+})();
+
 /* ══════════════════════════════════════════════ INTERACCIONES ═══ */
 document.querySelectorAll('.lang-switch button').forEach(b => {
   b.addEventListener('click', () => {
@@ -2069,6 +2309,7 @@ window.addEventListener('scroll', onScroll, { passive:true });
 
 document.getElementById('year').textContent = new Date().getFullYear();
 renderAll();
+countUpObservar();
 onScroll();
 </script>
 </body>

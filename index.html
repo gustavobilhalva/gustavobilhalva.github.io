@@ -46,7 +46,12 @@
 <!-- Inter: el CSS ya la pedía pero nunca se cargaba, así que caía a la fuente del sistema -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- ⚠ EJE VARIABLE (100..900), no cinco pesos sueltos. Es el requisito
+     de VariableProximity: font-variation-settings solo hace algo si la
+     fuente tiene ejes. Con los pesos fijos el efecto no rompe nada, pero
+     tampoco se ve. Si algún día se saca el efecto, se puede volver a
+     ?family=Inter:wght@300;400;500;600;700 -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2312171f'/><text x='50' y='68' font-size='52' font-family='system-ui,sans-serif' font-weight='600' fill='%234fd6a5' text-anchor='middle'>GB</text></svg>">
 
@@ -333,6 +338,53 @@ header.scrolled{border-bottom-color:var(--line-soft);background:rgba(12,16,21,.9
 }
 .menu-links a:active{color:var(--accent)}
 
+/* ═══════════════════════════ TIPOGRAFÍA REACTIVA (VariableProximity) ═══
+   Las letras de la bajada del hero engordan cuando el cursor se acerca.
+   Adaptación del VariableProximity de reactbits.dev.
+
+   Requiere fuente variable — ver el <link> de Google Fonts arriba. Si la
+   fuente cae al respaldo del sistema, font-variation-settings no hace
+   nada y el texto queda normal: degrada solo, no rompe.
+
+   Cada letra va en su propio <span> pero SIN display:inline-block. Es a
+   propósito: los spans en línea no crean oportunidades de corte, así que
+   el texto sigue partiéndose por palabras como siempre. Con inline-block
+   se cortaría en cualquier letra.                                       */
+.vp-l{
+  font-variation-settings:'wght' var(--w, 300);
+  will-change:font-variation-settings;
+}
+
+/* ═══════════════════════════ TÍTULOS QUE ENTRAN POR PALABRAS ═══
+   Los siete h2 entran escalonados en vez de aparecer de una con el
+   fundido del bloque. El disparador es el .in que ya pone el
+   IntersectionObserver de .reveal, así que no hay observer nuevo.
+
+   ⚠ EL PADRE TIENE QUE CEDER EL MOVIMIENTO. Antes esto no se veía, y el
+   motivo era de manual: .sec-head se funde y se desplaza durante 600ms,
+   y adentro de eso un escalonado de 45ms (dos palabras a 45ms de paso)
+   es invisible. La animación más larga y más fuerte se come a la corta.
+
+   Solución: el bloque SOLO se funde, rápido, y el desplazamiento lo
+   aportan las palabras. Un movimiento, no dos superpuestos.            */
+.sec-head.reveal,.contact-box.reveal{
+  transform:none;                       /* el padre no se desplaza */
+  transition:opacity .28s var(--ease);  /* y se funde rápido, para no tapar */
+}
+h2 .w{
+  display:inline-block;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .55s var(--ease),transform .55s var(--ease);
+  /* 110ms de paso: con títulos de 2 a 5 palabras, el escalonado dura
+     entre 110 y 440ms. Por debajo de ~100ms el ojo lo lee como una sola
+     cosa que aparece, no como una secuencia. */
+  transition-delay:calc(var(--i) * 110ms);
+}
+.reveal.in h2 .w{opacity:1;transform:none}
+/* Al cambiar de idioma la sección ya está visible: las palabras tienen
+   que aparecer puestas, no volver a entrar uña por uña. */
+h2.no-stagger .w{opacity:1;transform:none;transition:none}
+
 /* ════════════════════════════════════════════════════════ HERO ═══ */
 .hero{padding:142px 0 46px}
 .hero-grid{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:start}
@@ -347,39 +399,48 @@ header.scrolled{border-bottom-color:var(--line-soft);background:rgba(12,16,21,.9
 .avail .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);position:relative;flex-shrink:0}
 .avail .dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--accent);opacity:.45;animation:pulse 2.4s var(--ease) infinite}
 .hero h1{font-size:clamp(2.3rem,5.4vw,3.55rem);letter-spacing:-.035em;margin-bottom:14px}
-.hero h1 .light{font-weight:300}
+.hero h1 .n1{color:var(--text-primary)}
+.hero h1 .light{font-weight:300;color:var(--text-secondary)}
 
-/* ── Foco que barre el título de derecha a izquierda ──
-   La luz se recorta contra los glifos (background-clip:text), así
-   ilumina las letras y no el rectángulo del fondo. Cada mitad del
-   nombre conserva su color base dentro del degradado.            */
-.hero h1 .n1,.hero h1 .light{
-  -webkit-background-clip:text;background-clip:text;
-  color:transparent;-webkit-text-fill-color:transparent;
-  background-repeat:no-repeat;background-size:300% 100%;
-  animation:title-sweep 6.4s linear infinite;   /* 20% más rápido */
+/* ── El nombre se despliega como papel (FoldText de reactbits) ──
+   Cada letra baja girando sobre su borde superior, escalonada. El
+   original usa GSAP y ScrollTrigger; el efecto en sí es un rotateX con
+   perspectiva, así que acá son transiciones CSS y una clase.
+
+   ⚠ REEMPLAZA AL BARRIDO DE LUZ que estaba antes. Aquel se veía muy
+   poco: un haz que cruzaba en 2s y después se quedaba quieto 4,4s. La
+   diferencia de fondo es que esto es una ENTRADA —pasa una vez, al
+   cargar, y no te la podés perder— y aquello era un bucle sutil que
+   había que cazar. Con el barrido se fue también su trampa: ya no hay
+   background-clip:text en el título, así que el nombre no puede
+   volverse invisible por un background-position fuera de rango.
+
+   La perspectiva va en el transform de cada letra y no en un ancestro:
+   así no hace falta encadenar transform-style:preserve-3d por todos
+   los padres.                                                         */
+.fold-w{display:inline-block;white-space:nowrap}   /* la palabra no se parte */
+/* ⚠ Va con animation y NO con transition + una clase que ponga el JS.
+   La diferencia es a prueba de fallas: con animation, el estilo en
+   reposo de la letra es el estado FINAL —visible—, y los keyframes
+   aportan el estado inicial. Si la animación no corre por lo que sea,
+   el nombre se ve igual. Con transition había que agregar una clase
+   desde requestAnimationFrame, y si ese cuadro no llegaba el nombre
+   quedaba invisible. Ya tuvimos un nombre invisible en producción una
+   vez; no vamos a tener dos. */
+.fold-c{
+  display:inline-block;
+  transform-origin:50% 0%;                          /* la bisagra, arriba */
+  animation:fold-in .62s var(--ease) both;
+  animation-delay:calc(var(--i) * 38ms);
 }
-/* Las bases van un escalón por debajo del blanco puro: si el texto ya
-   estuviera al máximo, el foco no tendría a dónde iluminar. */
-/* El salto entre base y punta del haz es lo que se percibe como brillo.
-   Como el blanco ya está al tope, el 15% extra sale de bajar la base. */
-.hero h1 .n1{
-  background-image:linear-gradient(100deg,
-    #bbc6d3 42%, #ffffff 50%, #bbc6d3 58%);   /* haz angosto = se lee como foco */
-  animation-delay:1.2s;
+@keyframes fold-in{
+  from{transform:perspective(700px) rotateX(-92deg);opacity:0;filter:brightness(.45)}
+  to  {transform:none;opacity:1;filter:brightness(1)}
 }
-.hero h1 .light{
-  background-image:linear-gradient(100deg,
-    #74818f 42%, #f4f9fe 50%, #74818f 58%);
-  animation-delay:1.08s;          /* llega apenas antes: la luz cruza sin cortarse */
-}
-/* background-position DEBE quedar entre 0% y 100%: fuera de ese rango el
-   degradado sale del elemento y, como el texto es transparente, el nombre
-   se vuelve invisible. Dentro del rango siempre hay color base pintado. */
-@keyframes title-sweep{
-  0%       {background-position:0% 0}     /* la luz todavía no entró (derecha) */
-  32%,100% {background-position:100% 0}   /* la luz ya salió (izquierda) */
-}
+
+
+/* Los espacios entre palabras no se pliegan, pero sí tienen que estar */
+.fold-sp{display:inline-block;white-space:pre}
 .hero-role{font-size:clamp(1.02rem,2vw,1.16rem);font-weight:500;color:var(--accent);margin-bottom:22px}
 .hero-tagline{
   font-size:clamp(1.16rem,2.6vw,1.42rem);font-weight:300;color:var(--text-primary);
@@ -726,12 +787,14 @@ footer{padding:34px 0 44px;border-top:1px solid var(--line-soft);margin-top:20px
   .note-paper,.note-curl{transition:none}
   .bg i{animation:none}
   .menu-links a{transition-delay:0ms!important;opacity:1;transform:none}
+  h2 .w{transition-delay:0ms!important;opacity:1;transform:none}
+  .vp-l{font-variation-settings:normal}
   .spot::after{transition:none}
-  /* Sin foco: el título vuelve a color sólido, no a medio degradado */
-  .hero h1 .n1,.hero h1 .light{
-    background-image:none;-webkit-text-fill-color:currentColor;color:var(--text-primary);
+  /* El nombre aparece desplegado de una: nada de papel girando */
+  .fold-c{
+    animation:none!important;
+    transform:none!important;opacity:1!important;filter:none!important;
   }
-  .hero h1 .light{color:var(--text-secondary)}
 }
 
 /* ══════════════════════════════════════════════════ RESPONSIVE ═══ */
@@ -1801,8 +1864,136 @@ function applyStatic(){
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
 }
 
+/* ═══════════════════════════ TIPOGRAFÍA REACTIVA (VariableProximity) ═══
+   applyStatic() escribe con textContent, así que se lleva puestos los
+   <span> en cada render. Por eso estas dos funciones corren DESPUÉS,
+   dentro de renderAll(), y no una sola vez al cargar.                   */
+const VP = {
+  radius: 95,        // px de alcance
+  from: 300,         // el peso normal de la bajada
+  to: 720,           // el peso justo debajo del cursor
+  falloff: 'gauss'   // 'lineal' | 'exp' | 'gauss'
+};
+const VP_FALLOFF = {
+  lineal: n => n,
+  exp:    n => n * n,
+  gauss:  d => Math.exp(-((d / (VP.radius / 2)) ** 2) / 2)
+};
+
+let vpLetras = [], vpRects = null;
+
+function envolverBajada(){
+  const el = document.querySelector('.hero-tagline');
+  if (!el) { vpLetras = []; return; }
+  const texto = el.textContent;
+  const frag = document.createDocumentFragment();
+  for (const ch of texto){
+    if (ch === ' ' || ch === '\n'){ frag.appendChild(document.createTextNode(ch)); continue; }
+    const sp = document.createElement('span');
+    sp.className = 'vp-l';
+    sp.textContent = ch;
+    frag.appendChild(sp);
+  }
+  el.textContent = '';
+  el.appendChild(frag);
+  vpLetras = [...el.querySelectorAll('.vp-l')];
+  vpRects = null;
+}
+
+/* Los centros de cada letra se cachean: medir 50 rects por cuadro fuerza
+   layout 50 veces y se nota. Se invalidan al scrollear, al cambiar de
+   tamaño y en cada render. */
+function vpMedir(){
+  vpRects = vpLetras.map(el => {
+    const r = el.getBoundingClientRect();
+    return [r.left + r.width / 2, r.top + r.height / 2];
+  });
+}
+
+function vpPintar(x, y){
+  if (!vpLetras.length) return;
+  if (!vpRects || vpRects.length !== vpLetras.length) vpMedir();
+  const curva = VP_FALLOFF[VP.falloff] || VP_FALLOFF.gauss;
+  for (let i = 0; i < vpLetras.length; i++){
+    const [cx, cy] = vpRects[i];
+    const d = Math.hypot(x - cx, y - cy);
+    let n = 0;
+    if (d < VP.radius) n = VP.falloff === 'gauss' ? curva(d) : curva(1 - d / VP.radius);
+    vpLetras[i].style.setProperty('--w', (VP.from + (VP.to - VP.from) * n).toFixed(0));
+  }
+}
+function vpApagar(){ vpLetras.forEach(el => el.style.setProperty('--w', VP.from)); }
+
+/* ═══════════════════════════ EL NOMBRE QUE SE DESPLIEGA (FoldText) ═══
+   Parte el h1 en palabras y cada palabra en letras. Corre UNA sola vez:
+   el nombre no está en I18N —se escribe igual en los dos idiomas— así
+   que applyStatic() no lo toca y los spans sobreviven a los renders.   */
+function desplegarNombre(){
+  const h1 = document.querySelector('.hero h1');
+  if (!h1 || h1.dataset.folded) return;
+
+  /* Un lector de pantalla que se encuentra 23 spans podría deletrear el
+     nombre letra por letra. Con aria-label lo anuncia entero, y el texto
+     real sigue en el DOM para los buscadores. */
+  h1.setAttribute('aria-label', h1.textContent.replace(/\s+/g, ' ').trim());
+
+  let i = 0;
+  h1.querySelectorAll('.n1, .light').forEach(mitad => {
+    const partes = mitad.textContent.split(/(\s+)/).filter(Boolean);
+    const frag = document.createDocumentFragment();
+    for (const parte of partes){
+      if (/^\s+$/.test(parte)){
+        const sp = document.createElement('span');
+        sp.className = 'fold-sp'; sp.textContent = parte;
+        frag.appendChild(sp);
+        continue;
+      }
+      const palabra = document.createElement('span');
+      palabra.className = 'fold-w';
+      for (const ch of parte){
+        const letra = document.createElement('span');
+        letra.className = 'fold-c';
+        letra.style.setProperty('--i', i++);
+        letra.textContent = ch;
+        palabra.appendChild(letra);
+      }
+      frag.appendChild(palabra);
+    }
+    mitad.textContent = '';
+    mitad.appendChild(frag);
+  });
+  h1.dataset.folded = '1';
+  // No hace falta agregar ninguna clase: la animación arranca sola en
+  // cuanto las letras entran al DOM.
+}
+
+/* ═══════════════════════════ TÍTULOS QUE ENTRAN POR PALABRAS ═══ */
+function envolverTitulos(){
+  document.querySelectorAll('h2[data-i18n]').forEach(h2 => {
+    // Si la sección ya se reveló, las palabras van puestas de entrada.
+    const yaVisible = h2.closest('.reveal')?.classList.contains('in');
+    const partes = h2.textContent.split(/(\s+)/);
+    let i = 0;
+    const frag = document.createDocumentFragment();
+    for (const p of partes){
+      if (!p) continue;
+      if (/^\s+$/.test(p)){ frag.appendChild(document.createTextNode(p)); continue; }
+      const sp = document.createElement('span');
+      sp.className = 'w';
+      sp.style.setProperty('--i', i++);
+      sp.textContent = p;
+      frag.appendChild(sp);
+    }
+    h2.textContent = '';
+    h2.appendChild(frag);
+    h2.classList.toggle('no-stagger', !!yaVisible);
+  });
+}
+
 function renderAll(){
-  applyStatic(); renderHeroBadges(); renderSprint(); renderKpis();
+  applyStatic();
+  // Después de applyStatic, siempre: escribe con textContent y borra los spans
+  envolverBajada(); envolverTitulos(); renderHeroBadges(); renderSprint(); renderKpis();
   renderTimeline(); renderBoard(); renderQuotes(); renderRetro(); renderDod();
   renderEdu(); renderCerts(); renderVerified(); renderLangs(); renderDaily();
   observeReveals();
@@ -2139,6 +2330,34 @@ void main() {
   window.addEventListener('resize', () => { if (innerWidth > 960) cerrar(false); }, { passive:true });
 })();
 
+/* ═══════════════════════════ TIPOGRAFÍA REACTIVA — eventos ═══ */
+(function initVariableProximity(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let pend = null, raf = 0;
+  window.addEventListener('pointermove', e => {
+    pend = [e.clientX, e.clientY];
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = 0; if (pend) vpPintar(pend[0], pend[1]); });
+  }, { passive:true });
+  // Los centros cacheados dejan de valer si la página se mueve
+  window.addEventListener('scroll', () => { vpRects = null; }, { passive:true });
+  window.addEventListener('resize', () => { vpRects = null; }, { passive:true });
+  window.addEventListener('blur', vpApagar);
+
+  /* Inter se carga con display:swap, así que el texto se dibuja primero
+     con la fuente del sistema y DESPUÉS salta. Ese salto corre cada letra
+     unos píxeles y deja la caché vieja sin que haya scroll ni resize que
+     la invaliden. Medido: hasta 5px de desvío. */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { vpRects = null; });
+
+  /* Red de seguridad: al entrar a la bajada se vuelve a medir. Cubre
+     cualquier cosa que corra el layout sin disparar scroll ni resize
+     (zoom del navegador, una sección de arriba que cambia de alto). */
+  document.addEventListener('pointerenter', e => {
+    if (e.target.closest?.('.hero-tagline')) vpRects = null;
+  }, true);
+})();
+
 /* ══════════════════════════════════════════════ INTERACCIONES ═══ */
 document.querySelectorAll('.lang-switch button').forEach(b => {
   b.addEventListener('click', () => {
@@ -2346,6 +2565,7 @@ window.addEventListener('scroll', onScroll, { passive:true });
 
 document.getElementById('year').textContent = new Date().getFullYear();
 renderAll();
+desplegarNombre();
 countUpObservar();
 onScroll();
 </script>
